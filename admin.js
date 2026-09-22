@@ -437,8 +437,7 @@ function couponsPage(){
 }
 function licencesPage(){
   if(!loadedSettings?.lovable_api_key)return empty('API não configurada','Adicione sua Lovable API Key em Configurações > Integrações.');
-  const balanceStr=lovableBalance!==null?money(lovableBalance/100):'—';
-  let html=`<div class="split-toolbar"><div class="stat-top" style="align-items:center; gap:0.5rem"><strong>Saldo Restante:</strong><span style="font-size:1.1rem; color:var(--primary); font-weight:600">${balanceStr}</span><button class="icon-button" id="btnRefreshBalance" style="padding:4px; font-size:14px; border-radius:4px; border:1px solid var(--border-color); cursor:pointer; background:transparent" title="Atualizar saldo">🔄</button></div><div style="display:flex; gap:0.5rem"><select id="createLicenceType" class="form-input" style="width:140px; padding:0 0.5rem"><option value="lifetime">Vitalício</option><option value="basic_30d">Basic 30 dias</option></select><button class="btn-primary" id="btnCreateLicence">Gerar Licença</button></div></div>`;
+  let html=`<div class="split-toolbar"><div class="stat-top" style="align-items:center; gap:0.5rem"><span style="font-size:20px;">👑</span><strong>Plano Revendedor:</strong><span style="font-size:0.95rem; color:var(--ok); font-weight:700; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:8px;">Chaves Ilimitadas Grátis</span></div><div style="display:flex; gap:0.5rem"><select id="createLicenceType" class="form-input" style="width:140px; padding:0 0.5rem"><option value="lifetime">Vitalício</option><option value="basic_30d">Basic 30 dias</option></select><button class="btn-primary" id="btnCreateLicence">⚡ Gerar Licença Oficial</button></div></div>`;
   html+=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Chave (Token)</th><th>Tipo</th><th>Status</th><th>Criada em</th><th>Ação</th></tr></thead><tbody>`;
   lovableLicences.forEach(l=>{
     const isAvail=l.status==='disponivel';
@@ -811,7 +810,6 @@ function openDeliveryModal(id) {
 
   const planName = parsedPayload.plan || (o.delivery_type ? o.delivery_type.toUpperCase() : 'Vitalício Ilimitado');
   const isLifetime = planName.toLowerCase().includes('vitalício') || planName.toLowerCase().includes('vitalicio');
-  const balanceStr = lovableBalance !== null ? money(lovableBalance / 100) : 'Carregando…';
 
   modal(`
     <h2>${isDelivered ? 'Chave de Acesso Entregue' : 'Entrega da Chave de Acesso'}</h2>
@@ -856,16 +854,16 @@ function openDeliveryModal(id) {
         </a>
       </div>
     ` : `
-      <!-- Status do Saldo na API Lovable do Admin -->
-      <div style="background:#fcfaff; border:1.5px solid #dcd1f4; border-radius:14px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.04em;">Seu Saldo na API Lovable</div>
-          <div style="font-size:17px; font-weight:800; color:#1e1b29; margin-top:2px;" id="lblModalLovableBalance">${balanceStr}</div>
-          <small style="font-size:11px; color:#6b627b;">Saldo necessário para gerar a chave pela API oficial</small>
+      <!-- Status do Plano Revendedor Oficial -->
+      <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%); border: 1.5px solid #c4b5fd; border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:22px;">👑</span>
+          <div>
+            <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.04em;">Acesso Revendedor Oficial</div>
+            <div style="font-size:13px; font-weight:700; color:#1e1b29;">Licenças Ilimitadas & Gratuitas</div>
+          </div>
         </div>
-        <button type="button" class="btn-outline" id="btnRefreshBalModal" style="font-size:12px; padding:6px 12px;">
-          🔄 Atualizar Saldo
-        </button>
+        <span class="badge ok" style="font-size:11px; font-weight:700;">Revendedor Ativo</span>
       </div>
 
       <div id="modalApiErrorBox" style="display:none; background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:10px 14px; border-radius:10px; font-size:12.5px; margin-bottom:14px; line-height:1.5;"></div>
@@ -874,15 +872,15 @@ function openDeliveryModal(id) {
         <div style="margin-bottom:16px;">
           <label style="font-weight:700; font-size:13px; display:block; margin-bottom:6px;">Chave de Acesso / Licença Ilimitada:</label>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <input type="text" id="inputDeliveryKey" placeholder="Cole ou gere a chave..." value="${esc(o.license_key || '')}" style="flex:1;" required>
+            <input type="text" id="inputDeliveryKey" placeholder="Cole ou gere a chave oficial..." value="${esc(o.license_key || '')}" style="flex:1;" required>
             <button type="button" class="btn-outline" id="btnGenRandomKey" style="font-size:12px; white-space:nowrap;" title="Gera um código local">Gerar Código Rápido</button>
           </div>
           
-          <button type="button" class="btn-primary" id="btnGenerateViaApi" style="width:100%; font-size:12.5px; padding:9px 14px; background:#7c3aed; border-color:#7c3aed; gap:6px; margin-top:4px;">
+          <button type="button" class="btn-primary" id="btnGenerateViaApi" style="width:100%; font-size:13px; padding:10px 16px; background:#7c3aed; border-color:#7c3aed; gap:8px; margin-top:4px;">
             ⚡ Gerar Chave Oficial na API Lovable (${isLifetime ? 'Vitalício' : '30 Dias'})
           </button>
-          <small style="color:var(--text-3); font-size:11px; margin-top:6px; display:block;">
-            Se o seu saldo na API Lovable estiver carregado, clique acima para gerar a chave oficial. Se preferir, cole sua chave no campo acima.
+          <small style="color:var(--text-3); font-size:11.5px; margin-top:6px; display:block;">
+            Plano revendedor ativo: clique acima para gerar a chave oficial instantaneamente e sem custos.
           </small>
         </div>
 
@@ -902,28 +900,13 @@ function openDeliveryModal(id) {
   `, true);
 
   if (!isDelivered) {
-    if ($('btnRefreshBalModal')) {
-      $('btnRefreshBalModal').onclick = async () => {
-        const btn = $('btnRefreshBalModal');
-        btn.disabled = true;
-        btn.textContent = 'Consultando…';
-        await loadLovableData();
-        if ($('lblModalLovableBalance')) {
-          $('lblModalLovableBalance').textContent = lovableBalance !== null ? money(lovableBalance / 100) : '—';
-        }
-        btn.disabled = false;
-        btn.textContent = '🔄 Atualizar Saldo';
-        toast('Saldo da API Lovable atualizado!');
-      };
-    }
-
     if ($('btnGenerateViaApi')) {
       $('btnGenerateViaApi').onclick = async () => {
         const btn = $('btnGenerateViaApi');
         const errBox = $('modalApiErrorBox');
         errBox.style.display = 'none';
         btn.disabled = true;
-        btn.textContent = 'Consultando API Lovable…';
+        btn.textContent = 'Gerando chave oficial na API Lovable…';
         try {
           const apiKey = loadedSettings?.lovable_api_key;
           if (!apiKey) throw new Error('API Key da Lovable não configurada. Configure em Configurações > Integrações.');
@@ -935,17 +918,10 @@ function openDeliveryModal(id) {
           });
           const data = await res.json();
           if (!data.success) {
-            if (data.error && (data.error.toLowerCase().includes('saldo') || data.error.toLowerCase().includes('balance'))) {
-              throw new Error('⚠️ Saldo insuficiente na sua conta Lovable para gerar esta chave. Recarregue seu saldo na API Lovable ou digite a chave manualmente no campo acima.');
-            }
             throw new Error(data.error || 'Erro ao gerar licença na API.');
           }
           $('inputDeliveryKey').value = data.chave_token;
-          toast('✓ Chave gerada com sucesso pela API Lovable!');
-          await loadLovableData();
-          if ($('lblModalLovableBalance') && lovableBalance !== null) {
-            $('lblModalLovableBalance').textContent = money(lovableBalance / 100);
-          }
+          toast('✓ Chave oficial gerada com sucesso pela API Lovable!');
         } catch(e) {
           errBox.style.display = 'block';
           errBox.textContent = e.message;
@@ -1149,13 +1125,6 @@ function bindContent(){
     setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     toast('Exportação preparada.');
   };
-  if($('btnRefreshBalance'))$('btnRefreshBalance').onclick=async()=>{
-    const btn=$('btnRefreshBalance');
-    btn.style.opacity='0.5';
-    await loadLovableData();
-    render();
-    toast('Saldo atualizado!');
-  };
   if($('btnCreateLicence'))$('btnCreateLicence').onclick=async()=>{
     const type=$('createLicenceType').value;
     const apiKey=loadedSettings?.lovable_api_key;
@@ -1164,10 +1133,7 @@ function bindContent(){
       const res=await fetch('https://rest.lovableup.online/api/v1/create-licence',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({type})});
       const data=await res.json();
       if(!data.success){
-        if(data.error&&data.error.toLowerCase().includes('saldo')||data.error?.toLowerCase().includes('balance')){
-          throw new Error('Saldo mínimo necessário para gerar uma licença');
-        }
-        throw new Error(data.error||'Erro na API');
+        throw new Error(data.error||'Erro ao gerar licença na API Lovable');
       }
       toast('Licença gerada com sucesso!');
       await loadLovableData();
