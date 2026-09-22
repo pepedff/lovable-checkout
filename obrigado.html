@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pedido Confirmado! — LovableUnlimited</title>
+  <title>Status do Pagamento — LovableUnlimited</title>
   
   <!-- SEO & Social Meta Tags -->
-  <meta name="description" content="Obrigado pela sua compra! Seu pedido foi registrado com sucesso no LovableUnlimited.">
+  <meta name="description" content="Status e liberação de acesso ao LovableUnlimited.">
   <meta name="robots" content="noindex, follow">
 
   <!-- ============================================================
        COLE SEU PIXEL DE CONVERSÃO / TRACKING AQUI (FACEBOOK / GOOGLE)
-       Exemplo Meta Pixel:
-       fbq('track', 'Purchase', {value: 97.00, currency: 'BRL'});
        ============================================================ -->
 
   <!-- Google Fonts -->
@@ -20,8 +18,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=6">
-  <link rel="stylesheet" href="redesign.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="redesign.css?v=7">
 
   <!-- Confetti Canvas Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -43,7 +41,7 @@
     }
 
     .thankyou-card {
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(124, 58, 237, 0.18);
       border-radius: 28px;
@@ -54,21 +52,19 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+      0% { opacity: 0; transform: scale(0.94) translateY(15px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .success-badge {
+    /* Badges */
+    .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #ecfdf5;
-      color: #059669;
-      border: 1px solid #a7f3d0;
       padding: 8px 18px;
       border-radius: 999px;
       font-size: 14px;
@@ -76,52 +72,91 @@
       margin-bottom: 24px;
     }
 
-    .celebration-icon {
+    .badge-approved {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-pending {
+      background: #fffbeb;
+      color: #d97706;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-denied {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    /* Celebration & Status Icons */
+    .icon-circle {
       width: 90px;
       height: 90px;
       margin: 0 auto 20px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.4);
-      animation: pulseGlow 2.5s infinite ease-in-out;
     }
 
-    @keyframes pulseGlow {
+    .icon-approved {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.4);
+      animation: pulseGreen 2.5s infinite ease-in-out;
+    }
+
+    .icon-pending {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 15px 35px -5px rgba(245, 158, 11, 0.4);
+      animation: pulseAmber 2.5s infinite ease-in-out;
+    }
+
+    .icon-denied {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 15px 35px -5px rgba(239, 68, 68, 0.4);
+    }
+
+    @keyframes pulseGreen {
       0%, 100% { transform: scale(1); box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.4); }
-      50% { transform: scale(1.05); box-shadow: 0 20px 45px 0 rgba(16, 185, 129, 0.55); }
+      50% { transform: scale(1.05); box-shadow: 0 20px 45px 0 rgba(16, 185, 129, 0.6); }
+    }
+
+    @keyframes pulseAmber {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
     }
 
     .thankyou-title {
-      font-size: clamp(28px, 4vw, 36px);
+      font-size: clamp(26px, 4vw, 34px);
       font-weight: 750;
       color: #1e1b29;
       letter-spacing: -0.03em;
-      line-height: 1.15;
+      line-height: 1.2;
       margin-bottom: 12px;
     }
 
     .thankyou-subtitle {
-      font-size: 16px;
+      font-size: 15px;
       color: #5d566b;
       line-height: 1.6;
       max-width: 480px;
-      margin: 0 auto 28px;
+      margin: 0 auto 24px;
     }
 
-    .proto-box {
+    /* License Box */
+    .license-card {
       background: #faf8fd;
-      border: 2px dashed #d8c8f5;
+      border: 1.5px solid #d8c8f5;
       border-radius: 18px;
       padding: 20px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       text-align: center;
     }
 
-    .proto-title {
+    .license-label {
       font-size: 12px;
       font-weight: 600;
       color: #7c3aed;
@@ -130,98 +165,109 @@
       margin-bottom: 8px;
     }
 
-    .proto-number {
+    .license-input-wrap {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .license-input {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 24px;
+      font-size: 15px;
       font-weight: 700;
       color: #2e1d52;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-      display: block;
+      text-align: center;
+      background: #fff;
+      border: 1px solid #d8c8f5;
+      border-radius: 10px;
+      padding: 10px 14px;
+      flex: 1;
     }
 
     .copy-btn {
       background: #7c3aed;
       color: #fff;
       border: none;
-      padding: 10px 22px;
-      border-radius: 12px;
+      padding: 10px 18px;
+      border-radius: 10px;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s ease;
+      flex-shrink: 0;
     }
 
     .copy-btn:hover {
       background: #6d28d9;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px -4px rgba(124, 58, 237, 0.4);
     }
 
-    .steps-card {
+    /* Order Details Table */
+    .details-table {
       background: #f7f5fa;
       border-radius: 16px;
-      padding: 20px 24px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
       text-align: left;
-      margin-bottom: 28px;
     }
 
-    .steps-card h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #332b42;
-      margin-bottom: 12px;
-    }
-
-    .steps-card ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .dt-row {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .steps-card li {
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #eeeaf3;
       font-size: 14px;
-      color: #554d63;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      line-height: 1.4;
     }
 
+    .dt-row:last-child {
+      border-bottom: none;
+    }
+
+    .dt-label {
+      color: #70677d;
+    }
+
+    .dt-val {
+      font-weight: 600;
+      color: #211e2d;
+    }
+
+    /* Actions */
     .action-group {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .btn-main-action {
-      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    .btn-download-main {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
       color: #fff;
-      padding: 16px 24px;
+      padding: 18px 24px;
       border-radius: 14px;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 700;
       text-decoration: none;
+      border: none;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 12px 28px -6px rgba(124, 58, 237, 0.35);
+      box-shadow: 0 12px 28px -6px rgba(5, 150, 105, 0.4);
       transition: all 0.2s ease;
+      width: 100%;
     }
 
-    .btn-main-action:hover {
+    .btn-download-main:hover {
       transform: translateY(-2px);
-      box-shadow: 0 16px 36px -6px rgba(124, 58, 237, 0.45);
+      box-shadow: 0 16px 36px -6px rgba(5, 150, 105, 0.5);
     }
 
-    .btn-confetti-action {
+    .btn-secondary {
       background: #f1ebfa;
       color: #6d28d9;
       border: 1px solid #d8c8f5;
@@ -235,9 +281,10 @@
       justify-content: center;
       gap: 8px;
       transition: background 0.2s;
+      width: 100%;
     }
 
-    .btn-confetti-action:hover {
+    .btn-secondary:hover {
       background: #e4d7f7;
     }
 
@@ -246,18 +293,24 @@
       font-size: 14px;
       text-decoration: none;
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 14px;
       transition: color 0.2s;
     }
 
     .btn-back-home:hover {
       color: #211e2d;
     }
+
+    /* Spinner */
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-  <!-- Navbar Simples -->
+  <!-- Navbar -->
   <header class="navbar" style="position: relative;">
     <div class="nav-container">
       <a href="index.html" class="nav-brand">
@@ -266,111 +319,315 @@
         </span>
         <span class="brand-text">LovableUnlimited</span>
       </a>
-      <span style="font-size: 13px; font-weight: 600; color: #059669; background: #ecfdf5; padding: 6px 12px; border-radius: 8px;">
-        Pagamento Registrado
+      <span id="navStatusBadge" style="font-size: 13px; font-weight: 600; color: #7c3aed; background: #f5f3ff; padding: 6px 12px; border-radius: 8px;">
+        Verificando...
       </span>
     </div>
   </header>
 
-  <!-- Conteúdo Principal -->
+  <!-- Container Geral -->
   <main class="thankyou-wrapper">
     <div class="thankyou-card">
-      <div class="success-badge">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        Compra Registrada com Sucesso
+
+      <!-- ==========================================
+           ESTADO 1: CARREGANDO / VERIFICANDO
+           ========================================== -->
+      <div id="stateLoading">
+        <div class="icon-circle icon-pending" style="background: #f1ebfa; color: #7c3aed;">
+          <svg class="spin" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+        </div>
+        <h2 class="thankyou-title">Consultando Pagamento...</h2>
+        <p class="thankyou-subtitle">Estamos verificando o status do seu pedido com segurança.</p>
       </div>
 
-      <div class="celebration-icon">
-        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+      <!-- ==========================================
+           ESTADO 2: PAGAMENTO APROVADO (COM CONFETES!)
+           ========================================== -->
+      <div id="stateApproved" style="display: none;">
+        <div class="status-badge badge-approved">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          Pagamento Aprovado com Sucesso!
+        </div>
+
+        <div class="icon-circle icon-approved">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+
+        <h1 class="thankyou-title">Parabéns<span id="apNameGreeting"></span>! 🎉</h1>
+        <p class="thankyou-subtitle">
+          Seu pagamento PIX foi confirmado. Seu acesso vitalício ao <strong>LovableUnlimited</strong> está 100% liberado!
+        </p>
+
+        <!-- Chave de Licença (se existir) -->
+        <div class="license-card" id="licenseWrap" style="display: none;">
+          <div class="license-label">Sua Chave de Licença Vitalícia</div>
+          <div class="license-input-wrap">
+            <input type="text" id="apLicenseKey" readonly class="license-input" value="">
+            <button class="copy-btn" id="btnCopyLicense" onclick="copyLicense()">
+              <span id="copyLicenseTxt">Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabela de Detalhes -->
+        <div class="details-table">
+          <div class="dt-row"><span class="dt-label">Protocolo:</span><span class="dt-val mono" id="apProto">—</span></div>
+          <div class="dt-row"><span class="dt-label">Cliente:</span><span class="dt-val" id="apCustomerName">—</span></div>
+          <div class="dt-row"><span class="dt-label">E-mail:</span><span class="dt-val" id="apEmail">—</span></div>
+          <div class="dt-row"><span class="dt-label">Valor Pago:</span><span class="dt-val" id="apPrice">R$ 97,00</span></div>
+          <div class="dt-row"><span class="dt-label">Status:</span><span class="dt-val" style="color: #059669;">✅ Aprovado</span></div>
+        </div>
+
+        <!-- Ações: Download & Confetes -->
+        <div class="action-group">
+          <button class="btn-download-main" onclick="downloadProduct()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            BAIXAR LOVABLEUNLIMITED AGORA
+          </button>
+
+          <button class="btn-secondary" onclick="fireCelebration()">
+            🎊 Soltar mais confetes comemorativos!
+          </button>
+        </div>
       </div>
 
-      <h1 class="thankyou-title">Parabéns<span id="userNameGreeting"></span>! 🎉</h1>
-      <p class="thankyou-subtitle">
-        Recebemos a confirmação do seu pedido via PIX. Seu acesso vitalício ao <strong>LovableUnlimited</strong> está sendo processado!
-      </p>
+      <!-- ==========================================
+           ESTADO 3: PENDENTE (AGUARDANDO CONFIRMAÇÃO DO PIX)
+           ========================================== -->
+      <div id="statePending" style="display: none;">
+        <div class="status-badge badge-pending">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Aguardando Confirmação do PIX
+        </div>
 
-      <!-- Protocolo -->
-      <div class="proto-box">
-        <div class="proto-title">Seu Protocolo de Ativação</div>
-        <span class="proto-number" id="displayProtocol">EULA-......</span>
-        <button class="copy-btn" id="btnCopy" onclick="copyProtocol()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span id="copyText">Copiar Protocolo</span>
-        </button>
+        <div class="icon-circle icon-pending">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+
+        <h1 class="thankyou-title">Pedido em Processamento</h1>
+        <p class="thankyou-subtitle">
+          Recebemos a solicitação do seu pedido. Assim que o pagamento via PIX for aprovado, esta tela atualizará automaticamente liberando seu download e sua licença.
+        </p>
+
+        <!-- Protocolo -->
+        <div class="license-card">
+          <div class="license-label">Seu Protocolo</div>
+          <div class="license-input-wrap">
+            <input type="text" id="pendingProtoInput" readonly class="license-input" value="">
+            <button class="copy-btn" onclick="copyPendingProto()">
+              <span id="copyProtoTxt">Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-group">
+          <button class="btn-secondary" id="btnRefreshStatus" onclick="checkOrderStatus(true)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Verificar se já foi aprovado
+          </button>
+        </div>
+        <p style="font-size: 12px; color: #8c829c; margin-top: 15px;">
+          ⏱️ A página checa automaticamente a cada 10 segundos.
+        </p>
       </div>
 
-      <!-- Próximos Passos -->
-      <div class="steps-card">
-        <h4>⚡ O que acontece agora:</h4>
-        <ul>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span><strong>Pagamento PIX:</strong> O sistema identifica o comprovante em instantes.</span>
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span><strong>Acesso Liberado:</strong> O status passa para aprovado e libera o download imediato.</span>
-          </li>
-          <li>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            <span><strong>Download & Chave:</strong> Guarde seu protocolo para baixar os arquivos atualizados quando quiser.</span>
-          </li>
-        </ul>
-      </div>
+      <!-- ==========================================
+           ESTADO 4: NÃO AUTORIZADO / SEM PEDIDO
+           ========================================== -->
+      <div id="stateUnauthorized" style="display: none;">
+        <div class="status-badge badge-denied">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Acesso Restrito
+        </div>
 
-      <!-- Ações -->
-      <div class="action-group">
-        <a id="btnCheckStatus" href="index.html" class="btn-main-action">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          Consultar Status & Download
-        </a>
+        <div class="icon-circle icon-denied">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
 
-        <button class="btn-confetti-action" onclick="fireCelebration()">
-          🎊 Celebrar com mais confetes!
-        </button>
+        <h1 class="thankyou-title">Nenhum Pedido Aprovado</h1>
+        <p class="thankyou-subtitle">
+          Para acessar o download do LovableUnlimited e sua licença, é necessário realizar o pedido na página inicial.
+        </p>
+
+        <div class="action-group">
+          <a href="index.html" class="btn-download-main" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+            Ir para a Página de Vendas
+          </a>
+        </div>
       </div>
 
       <a href="index.html" class="btn-back-home">← Voltar à página inicial</a>
     </div>
   </main>
 
-  <script>
-    // Ler protocolo e nome da URL
-    const params = new URLSearchParams(window.location.search);
-    const protocol = params.get('proto') || 'EULA-' + Math.floor(100000 + Math.random() * 900000);
-    const name = params.get('name') || '';
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    document.getElementById('displayProtocol').textContent = protocol;
-    if (name) {
-      document.getElementById('userNameGreeting').textContent = ', ' + name.split(' ')[0];
+  <script>
+    const SUPABASE_URL = 'https://yuktuarickwxohhyumyj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1a3R1YXJpY2t3eG9oaHl1bXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODcyNzcsImV4cCI6MjEwNTY2MzI3N30.yybJVLndcz2peNsdFPZ_8_L67np3cKl1MdwJV21AmUQ';
+    
+    let supabaseClient = null;
+    try {
+      supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    } catch(e) {}
+
+    let DOWNLOAD_URL = 'lovableunlimited.zip';
+    let currentProtocol = '';
+    let autoPollingInterval = null;
+
+    // Alternar visualização dos estados
+    function showState(state) {
+      document.getElementById('stateLoading').style.display = 'none';
+      document.getElementById('stateApproved').style.display = 'none';
+      document.getElementById('statePending').style.display = 'none';
+      document.getElementById('stateUnauthorized').style.display = 'none';
+
+      const navBadge = document.getElementById('navStatusBadge');
+
+      if (state === 'approved') {
+        document.getElementById('stateApproved').style.display = 'block';
+        navBadge.textContent = '✅ Aprovado';
+        navBadge.style.color = '#059669';
+        navBadge.style.background = '#ecfdf5';
+      } else if (state === 'pending') {
+        document.getElementById('statePending').style.display = 'block';
+        navBadge.textContent = '⏳ Em Análise';
+        navBadge.style.color = '#d97706';
+        navBadge.style.background = '#fffbeb';
+      } else if (state === 'unauthorized') {
+        document.getElementById('stateUnauthorized').style.display = 'block';
+        navBadge.textContent = '🔒 Bloqueado';
+        navBadge.style.color = '#dc2626';
+        navBadge.style.background = '#fef2f2';
+      } else {
+        document.getElementById('stateLoading').style.display = 'block';
+      }
     }
 
-    // Configurar link de consulta
-    const checkLink = document.getElementById('btnCheckStatus');
-    checkLink.href = 'index.html?proto=' + encodeURIComponent(protocol);
+    // Função de checagem do pedido no Supabase
+    async function checkOrderStatus(isManual = false) {
+      const urlParams = new URLSearchParams(window.location.search);
+      currentProtocol = (urlParams.get('proto') || '').trim();
 
-    // Função de copiar protocolo
-    function copyProtocol() {
-      navigator.clipboard.writeText(protocol).then(() => {
-        const copyText = document.getElementById('copyText');
-        const btn = document.getElementById('btnCopy');
-        copyText.textContent = 'Copiado com sucesso!';
-        btn.style.background = '#059669';
-        setTimeout(() => {
-          copyText.textContent = 'Copiar Protocolo';
-          btn.style.background = '#7c3aed';
-        }, 2200);
+      if (!currentProtocol) {
+        showState('unauthorized');
+        return;
+      }
+
+      if (isManual) {
+        const btn = document.getElementById('btnRefreshStatus');
+        if (btn) btn.innerHTML = '<span class="spin">⟳</span> Verificando...';
+      }
+
+      try {
+        if (!supabaseClient) throw new Error('Offline');
+
+        const { data, error } = await supabaseClient
+          .from('orders')
+          .select('*')
+          .eq('protocol', currentProtocol)
+          .single();
+
+        if (error || !data) {
+          showState('unauthorized');
+          return;
+        }
+
+        // Tentar obter download_url das configurações
+        try {
+          const { data: setts } = await supabaseClient.from('settings').select('download_url').single();
+          if (setts && setts.download_url) DOWNLOAD_URL = setts.download_url;
+        } catch(e){}
+
+        if (data.status === 'approved') {
+          // Parar polling se aprovado
+          if (autoPollingInterval) clearInterval(autoPollingInterval);
+
+          document.getElementById('apProto').textContent = data.protocol;
+          document.getElementById('apCustomerName').textContent = data.name || 'Cliente';
+          document.getElementById('apEmail').textContent = data.email || '—';
+          if (data.amount) {
+            document.getElementById('apPrice').textContent = `R$ ${Number(data.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+          }
+          if (data.name) {
+            document.getElementById('apNameGreeting').textContent = ', ' + data.name.split(' ')[0];
+          }
+
+          // Licença
+          const licWrap = document.getElementById('licenseWrap');
+          if (data.license_key) {
+            licWrap.style.display = 'block';
+            document.getElementById('apLicenseKey').value = data.license_key;
+          } else {
+            licWrap.style.display = 'none';
+          }
+
+          showState('approved');
+
+          // Disparar confetes se ainda não disparou
+          if (!window.celebrated) {
+            window.celebrated = true;
+            setTimeout(fireCelebration, 200);
+            setTimeout(fireCelebration, 1200);
+          }
+        } else {
+          // Status Pendente
+          document.getElementById('pendingProtoInput').value = data.protocol;
+          showState('pending');
+        }
+      } catch(err) {
+        console.warn('Erro ao consultar status:', err);
+        showState('unauthorized');
+      } finally {
+        if (isManual) {
+          const btn = document.getElementById('btnRefreshStatus');
+          if (btn) btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Verificar se já foi aprovado';
+        }
+      }
+    }
+
+    // Copiar Licença
+    function copyLicense() {
+      const val = document.getElementById('apLicenseKey').value;
+      if (!val) return;
+      navigator.clipboard.writeText(val).then(() => {
+        const txt = document.getElementById('copyLicenseTxt');
+        txt.textContent = 'Copiado!';
+        setTimeout(() => txt.textContent = 'Copiar', 2000);
       });
     }
 
-    // Efeito de Confetes Elegante e Festivo
+    // Copiar Protocolo Pendente
+    function copyPendingProto() {
+      const val = document.getElementById('pendingProtoInput').value;
+      if (!val) return;
+      navigator.clipboard.writeText(val).then(() => {
+        const txt = document.getElementById('copyProtoTxt');
+        txt.textContent = 'Copiado!';
+        setTimeout(() => txt.textContent = 'Copiar', 2000);
+      });
+    }
+
+    // Baixar Produto
+    async function downloadProduct() {
+      if (supabaseClient && currentProtocol) {
+        try {
+          await supabaseClient.rpc('increment_download', { p_protocol: currentProtocol });
+        } catch(e) {}
+      }
+      const a = document.createElement('a');
+      a.href = DOWNLOAD_URL;
+      a.download = 'lovableunlimited.zip';
+      a.click();
+    }
+
+    // Confetes Elegantes e Festivos
     function fireCelebration() {
       if (typeof confetti !== 'function') return;
 
-      const count = 200;
-      const defaults = {
-        origin: { y: 0.65 }
-      };
+      const count = 220;
+      const defaults = { origin: { y: 0.65 } };
 
       function fire(particleRatio, opts) {
         confetti(Object.assign({}, defaults, opts, {
@@ -378,39 +635,19 @@
         }));
       }
 
-      // Canhão variado
-      fire(0.25, {
-        spread: 30,
-        startVelocity: 55,
-        colors: ['#7c3aed', '#10b981', '#f59e0b']
-      });
-      fire(0.2, {
-        spread: 60,
-        colors: ['#a855f7', '#3b82f6', '#ec4899']
-      });
-      fire(0.35, {
-        spread: 100,
-        decay: 0.91,
-        scalar: 0.9,
-        colors: ['#8b5cf6', '#10b981', '#ffffff']
-      });
-      fire(0.1, {
-        spread: 120,
-        startVelocity: 25,
-        decay: 0.92,
-        colors: ['#c084fc', '#34d399', '#f43f5e']
-      });
-      fire(0.1, {
-        spread: 120,
-        startVelocity: 45,
-        colors: ['#7c3aed', '#6366f1']
-      });
+      fire(0.25, { spread: 35, startVelocity: 55, colors: ['#7c3aed', '#10b981', '#f59e0b'] });
+      fire(0.2, { spread: 65, colors: ['#a855f7', '#3b82f6', '#ec4899'] });
+      fire(0.35, { spread: 100, decay: 0.91, scalar: 0.9, colors: ['#8b5cf6', '#10b981', '#ffffff'] });
+      fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, colors: ['#c084fc', '#34d399', '#f43f5e'] });
+      fire(0.1, { spread: 120, startVelocity: 45, colors: ['#7c3aed', '#6366f1'] });
     }
 
-    // Disparar confetes automaticamente ao carregar
-    window.addEventListener('load', () => {
-      setTimeout(fireCelebration, 250);
-      setTimeout(fireCelebration, 1200);
+    // Iniciar checagem ao carregar e polling a cada 10s
+    window.addEventListener('DOMContentLoaded', () => {
+      checkOrderStatus();
+      autoPollingInterval = setInterval(() => {
+        checkOrderStatus();
+      }, 10000);
     });
   </script>
 </body>
