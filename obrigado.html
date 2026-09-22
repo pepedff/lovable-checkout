@@ -909,7 +909,10 @@
           if (planEl) planEl.textContent = planLabel;
 
           // Exibir Chave
-          const activeKey = (payload && (payload.key || payload.license_key)) || data.license_key || 'ACESSO-VITALICIO-LIBERADO';
+          let activeKey = (payload && (payload.key || payload.license_key)) || data.license_key;
+          if (!activeKey || activeKey === 'undefined' || activeKey === 'null') {
+            activeKey = 'ACESSO-VITALICIO-LIBERADO';
+          }
           document.getElementById('secDeliveredKey').style.display = 'block';
           document.getElementById('valDeliveredKey').value = activeKey;
 

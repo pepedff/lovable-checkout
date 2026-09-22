@@ -678,7 +678,7 @@ function orderDetail(id){
       <div><dt>Confirmado em</dt><dd>${o.approved_at ? date(o.approved_at) : '—'}</dd></div>
       <div><dt>Entregue em</dt><dd>${o.delivered_at ? date(o.delivered_at) : '—'}</dd></div>
       ${o.delivered_by ? `<div><dt>Entregue por</dt><dd>${esc(o.delivered_by)}</dd></div>` : ''}
-      ${o.license_key ? `<div><dt>Chave / Licença</dt><dd class="mono" style="color:var(--primary); font-weight:700;">${esc(o.license_key)}</dd></div>` : ''}
+      ${(o.license_key && o.license_key !== 'undefined') ? `<div><dt>Chave / Licença</dt><dd class="mono" style="color:var(--primary); font-weight:700;">${esc(o.license_key)}</dd></div>` : ''}
     </dl>
 
     ${auditLogs.length ? `
@@ -841,7 +841,7 @@ function openDeliveryModal(id) {
         </div>
         <p style="margin-bottom:10px;">
           🔑 <b>Chave Entregue:</b> 
-          <code style="background:#fff; padding:6px 12px; border-radius:8px; font-weight:700; border:1px solid #c4b5fd; font-size:14px; display:inline-block; margin-top:4px;">${esc(o.license_key || parsedPayload.key)}</code>
+          <code style="background:#fff; padding:6px 12px; border-radius:8px; font-weight:700; border:1px solid #c4b5fd; font-size:14px; display:inline-block; margin-top:4px;">${esc((o.license_key && o.license_key !== 'undefined') ? o.license_key : ((parsedPayload.key && parsedPayload.key !== 'undefined') ? parsedPayload.key : 'Chave Oficial Ilimitada'))}</code>
         </p>
         ${parsedPayload.message ? `<p style="margin-bottom:8px; font-size:13px;">💬 <b>Instruções:</b> ${esc(parsedPayload.message)}</p>` : ''}
         <div style="font-size:12px; color:var(--text-3); margin-top:12px; border-top:1px dashed #c4b5fd; padding-top:8px;">
@@ -872,7 +872,7 @@ function openDeliveryModal(id) {
         <div style="margin-bottom:16px;">
           <label style="font-weight:700; font-size:13px; display:block; margin-bottom:6px;">Chave de Acesso / Licença Ilimitada:</label>
           <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <input type="text" id="inputDeliveryKey" placeholder="Cole ou gere a chave oficial..." value="${esc(o.license_key || '')}" style="flex:1;" required>
+            <input type="text" id="inputDeliveryKey" placeholder="Cole ou gere a chave oficial..." value="${esc((o.license_key && o.license_key !== 'undefined') ? o.license_key : '')}" style="flex:1;" required>
             <button type="button" class="btn-outline" id="btnGenRandomKey" style="font-size:12px; white-space:nowrap;" title="Gera um código local">Gerar Código Rápido</button>
           </div>
           
@@ -920,7 +920,19 @@ function openDeliveryModal(id) {
           if (!data.success) {
             throw new Error(data.error || 'Erro ao gerar licença na API.');
           }
-          $('inputDeliveryKey').value = data.chave_token;
+          const generatedKey = data.license?.chave_token 
+            || data.license?.token 
+            || data.chave_token 
+            || data.token 
+            || data.key 
+            || data.license_key;
+
+          if (!generatedKey) {
+            console.error('Resposta da API:', data);
+            throw new Error('Chave não encontrada no retorno da API Lovable.');
+          }
+
+          $('inputDeliveryKey').value = generatedKey;
           toast('✓ Chave oficial gerada com sucesso pela API Lovable!');
         } catch(e) {
           errBox.style.display = 'block';
@@ -944,8 +956,8 @@ function openDeliveryModal(id) {
       const key = $('inputDeliveryKey')?.value.trim() || '';
       const msg = $('inputDeliveryMsg')?.value.trim() || '';
 
-      if (!key) {
-        toast('Informe ou gere a chave de ativação para continuar.', true);
+      if (!key || key === 'undefined' || key === 'null') {
+        toast('Informe ou gere uma chave de ativação válida para continuar.', true);
         return;
       }
 
@@ -1135,7 +1147,8 @@ function bindContent(){
       if(!data.success){
         throw new Error(data.error||'Erro ao gerar licença na API Lovable');
       }
-      toast('Licença gerada com sucesso!');
+      const newKey = data.license?.chave_token || data.license?.token || data.chave_token || data.token;
+      toast(`✓ Licença gerada com sucesso: ${newKey || ''}`);
       await loadLovableData();
       render();
     }catch(e){

@@ -358,7 +358,7 @@ async function checkStatus() {
       
       const licenseSection = document.getElementById('licenseSection');
       if (licenseSection) {
-        if (order.license_key) {
+        if (order.license_key && order.license_key !== 'undefined' && order.license_key !== 'null') {
            licenseSection.style.display = 'block';
            document.getElementById('srLicenseKey').value = order.license_key;
         } else {
