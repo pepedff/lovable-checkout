@@ -454,22 +454,39 @@ document.addEventListener('DOMContentLoaded', () => {
     switchView('terms');
   }
 
+  renderPlanCards();
   loadDynamicSettings();
 });
 
 const PLANS = {
-  vitalicio: { id: 'vitalicio', category: 'Vitalício', duration: 'Vitalício', price: 54.90, name: 'Vitalício Ilimitado' },
-  pro_7d: { id: 'pro_7d', category: 'Pro', duration: '7 Dias', price: 23.90, name: 'Pro (7 Dias)' },
-  pro_15d: { id: 'pro_15d', category: 'Pro', duration: '15 Dias', price: 28.90, name: 'Pro (15 Dias)' },
-  pro_30d: { id: 'pro_30d', category: 'Pro', duration: '30 Dias', price: 36.90, name: 'Pro (30 Dias)' },
-  basic_7d: { id: 'basic_7d', category: 'Basic', duration: '7 Dias', price: 10.90, name: 'Basic (7 Dias)' },
-  basic_15d: { id: 'basic_15d', category: 'Basic', duration: '15 Dias', price: 14.90, name: 'Basic (15 Dias)' },
-  basic_30d: { id: 'basic_30d', category: 'Basic', duration: '30 Dias', price: 19.90, name: 'Basic (30 Dias)' }
+  vitalicio: { id: 'vitalicio', category: 'Vitalício', duration: 'Vitalício', price: 69.90, name: 'Vitalício Ilimitado' },
+  pro_7d: { id: 'pro_7d', category: 'Pro', duration: '7 Dias', price: 34.90, name: 'Pro (7 Dias)' },
+  pro_15d: { id: 'pro_15d', category: 'Pro', duration: '15 Dias', price: 39.90, name: 'Pro (15 Dias)' },
+  pro_30d: { id: 'pro_30d', category: 'Pro', duration: '30 Dias', price: 49.90, name: 'Pro (30 Dias)' },
+  basic_7d: { id: 'basic_7d', category: 'Basic', duration: '7 Dias', price: 19.90, name: 'Basic (7 Dias)' },
+  basic_15d: { id: 'basic_15d', category: 'Basic', duration: '15 Dias', price: 24.90, name: 'Basic (15 Dias)' },
+  basic_30d: { id: 'basic_30d', category: 'Basic', duration: '30 Dias', price: 29.90, name: 'Basic (30 Dias)' }
 };
 
 let selectedPlanKey = 'vitalicio';
-let basePrice = 54.90;
+let basePrice = 69.90;
 let currentCoupon = null;
+
+function renderPlanCards() {
+  const priceEls = {
+    priceVitalicio: PLANS.vitalicio.price,
+    pricePro7d: PLANS.pro_7d.price,
+    pricePro15d: PLANS.pro_15d.price,
+    pricePro30d: PLANS.pro_30d.price,
+    priceBasic7d: PLANS.basic_7d.price,
+    priceBasic15d: PLANS.basic_15d.price,
+    priceBasic30d: PLANS.basic_30d.price,
+  };
+  for (const [id, price] of Object.entries(priceEls)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `R$ ${price.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+  }
+}
 
 function selectPlan(planKey) {
   if (!PLANS[planKey]) return;
@@ -587,12 +604,14 @@ async function loadDynamicSettings() {
           const pixEl = document.getElementById('pixStr');
           if (pixEl) pixEl.value = data.pix_key;
         }
-        if (data.product_price) {
-          PLANS.vitalicio.price = Number(data.product_price);
+        // Ignora valores legados antigos (200 ou 97) para não desconfigurar os planos
+        const numPrice = Number(data.product_price);
+        if (numPrice && numPrice !== 200 && numPrice !== 97 && numPrice !== 54.90) {
+          PLANS.vitalicio.price = numPrice;
           if (selectedPlanKey === 'vitalicio') {
-            basePrice = Number(data.product_price);
+            basePrice = numPrice;
           }
-          document.querySelectorAll('.sl-discount').forEach(el => el.style.display = 'none');
+          renderPlanCards();
           updateCheckoutPrice();
         }
       }

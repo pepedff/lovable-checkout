@@ -291,7 +291,7 @@ function subscriptions(){
       <div style="background:#faf5ff; border:2px solid #7c3aed; border-radius:20px; padding:20px; position:relative;">
         <span style="position:absolute; top:-10px; right:16px; background:#7c3aed; color:#fff; font-size:10px; font-weight:700; padding:2px 10px; border-radius:12px;">MAIS VENDIDO</span>
         <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:4px;">👑 Plano Vitalício</div>
-        <div style="font-size:24px; font-weight:800; color:#1e1b29; margin-bottom:10px;">R$ 54,90 <small style="font-size:12px; color:#6b627b; font-weight:500;">pagamento único</small></div>
+        <div style="font-size:24px; font-weight:800; color:#1e1b29; margin-bottom:10px;">R$ 69,90 <small style="font-size:12px; color:#6b627b; font-weight:500;">pagamento único</small></div>
         <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Acesso permanente e ilimitado à extensão LovableUnlimited.</p>
       </div>
 
@@ -299,9 +299,9 @@ function subscriptions(){
       <div style="background:#fff; border:1.5px solid #e4ddec; border-radius:20px; padding:20px;">
         <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:4px;">⚡ Plano Pro (Ilimitado)</div>
         <div style="display:flex; gap:8px; margin-top:8px; margin-bottom:10px;">
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 23,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 28,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 36,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 34,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 39,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 49,90</b></div>
         </div>
         <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Uso ilimitado com prazos flexíveis.</p>
       </div>
@@ -310,9 +310,9 @@ function subscriptions(){
       <div style="background:#fff; border:1.5px solid #e4ddec; border-radius:20px; padding:20px;">
         <div style="font-size:12px; font-weight:700; color:#4b5563; text-transform:uppercase; margin-bottom:4px;">🔹 Plano Basic (Econômico)</div>
         <div style="display:flex; gap:8px; margin-top:8px; margin-bottom:10px;">
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 10,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 14,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 19,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 19,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 24,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 29,90</b></div>
         </div>
         <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Entrada acessível para testar a ferramenta.</p>
       </div>
@@ -502,7 +502,7 @@ function settingsPage() {
       </div>
     `;
   } else if (settingCategory === 'Pagamentos') {
-    formContent = `<p>Dados para o recebimento via PIX.</p><form id="settingsForm"><label>Preço do Produto (R$)<input type="number" step="0.01" min="0" name="product_price" required value="${esc(loadedSettings?.product_price||97)}"></label><label>Sua Chave PIX<input name="pix_key" required placeholder="Sua chave CPF, Email ou Celular" value="${esc(loadedSettings?.pix_key||'')}"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button></form>`;
+    formContent = `<p>Dados para o recebimento via PIX.</p><form id="settingsForm"><label>Preço do Plano Vitalício (R$)<input type="number" step="0.01" min="0" name="product_price" required value="${esc((loadedSettings?.product_price && loadedSettings.product_price !== 200 && loadedSettings.product_price !== 97) ? loadedSettings.product_price : 69.90)}"></label><label>Sua Chave PIX<input name="pix_key" required placeholder="Sua chave CPF, Email ou Celular" value="${esc(loadedSettings?.pix_key||'')}"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button></form>`;
   } else if (settingCategory === 'Extensão') {
     const curUrl = loadedSettings?.download_url || 'lovableunlimited.zip';
     formContent = `
