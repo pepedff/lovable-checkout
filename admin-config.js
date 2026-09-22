@@ -1,0 +1,2 @@
+const SUPABASE_URL = 'https://yuktuarickwxohhyumyj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1a3R1YXJpY2t3eG9oaHl1bXlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwODcyNzcsImV4cCI6MjEwNTY2MzI3N30.yybJVLndcz2peNsdFPZ_8_L67np3cKl1MdwJV21AmUQ';

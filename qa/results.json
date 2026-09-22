@@ -1,0 +1,164 @@
+[
+  {
+    "surface": "landing",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "users",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "subscriptions",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "payments",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "coupons",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "extension",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "logs",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "support",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "settings",
+    "device": "desktop",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "landing",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "users",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "subscriptions",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "payments",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "coupons",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "extension",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "logs",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "support",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "settings",
+    "device": "tablet",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "landing",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "users",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "subscriptions",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "payments",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "coupons",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "extension",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "logs",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "support",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  },
+  {
+    "surface": "settings",
+    "device": "mobile",
+    "overflow": false,
+    "errors": []
+  }
+]
