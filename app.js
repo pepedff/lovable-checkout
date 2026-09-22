@@ -242,14 +242,16 @@ async function submitOrder() {
       console.log('📋 Pedido (modo offline):', { name, email, cpf, protocol, status: 'pending' });
     }
 
-    // Exibir protocolo na tela de pendente
-    document.getElementById('pendingProto').textContent = protocol;
+    // Exibir protocolo na tela de pendente (fallback)
+    const protoEl = document.getElementById('pendingProto');
+    if (protoEl) protoEl.textContent = protocol;
 
     // Preencher campo de consulta com o protocolo
     const statusProtoInput = document.getElementById('statusProto');
     if (statusProtoInput) statusProtoInput.value = protocol;
 
-    switchView('pending');
+    // Redirecionar para a página de obrigado com confetes para rastreamento de anúncios
+    window.location.href = `obrigado.html?proto=${encodeURIComponent(protocol)}&name=${encodeURIComponent(name)}`;
   } catch (err) {
     if (err.message.includes('row-level security')) {
       showError('coError', 'Você está logado como Admin e não pode fazer compras. Use uma aba anônima!');
@@ -430,7 +432,18 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollspy();
   initTerms();
   initMasks();
-  switchView('terms');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const protoParam = urlParams.get('proto');
+  if (protoParam) {
+    const statusProtoInput = document.getElementById('statusProto');
+    if (statusProtoInput) statusProtoInput.value = protoParam;
+    switchView('status');
+    checkStatus();
+  } else {
+    switchView('terms');
+  }
+
   loadDynamicSettings();
 });
 
