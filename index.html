@@ -132,6 +132,71 @@
           <h1 class="co-heading">Finalizar compra</h1>
           <p class="co-sub">Preencha seus dados e pague via PIX para receber o download.</p>
 
+          <!-- Seletor de Planos -->
+          <div class="plans-selector-wrap">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.85rem; font-weight:700; color:var(--text-1); text-transform:uppercase; letter-spacing:0.04em;">Selecione o seu plano</span>
+              <span class="plan-tier-tag">Acesso Ilimitado</span>
+            </div>
+
+            <!-- Vitalício Hero Card -->
+            <div class="plan-hero-card active" id="cardVitalicio" onclick="selectPlan('vitalicio')">
+              <span class="plan-badge-tag">Mais Escolhido</span>
+              <div>
+                <div style="font-weight:700; font-size:1.05rem; color:var(--text-1);">👑 Vitalício Ilimitado</div>
+                <div style="font-size:0.8rem; color:var(--text-3); margin-top:2px;">Acesso vitalício completo à extensão</div>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:1.35rem; font-weight:800; color:var(--primary);">R$ 54,90</span>
+                <div style="font-size:0.75rem; color:var(--text-3);">pagamento único</div>
+              </div>
+            </div>
+
+            <!-- Pro Tier -->
+            <div class="plan-tier-card">
+              <div class="plan-tier-header">
+                <span class="plan-tier-title">⚡ Plano Pro</span>
+                <span class="plan-tier-tag">Ilimitado</span>
+              </div>
+              <div class="plan-pill-grid">
+                <button type="button" class="plan-pill-btn" data-plan="pro_7d" onclick="selectPlan('pro_7d')">
+                  <b>7 Dias</b>
+                  <span>R$ 23,90</span>
+                </button>
+                <button type="button" class="plan-pill-btn" data-plan="pro_15d" onclick="selectPlan('pro_15d')">
+                  <b>15 Dias</b>
+                  <span>R$ 28,90</span>
+                </button>
+                <button type="button" class="plan-pill-btn" data-plan="pro_30d" onclick="selectPlan('pro_30d')">
+                  <b>30 Dias</b>
+                  <span>R$ 36,90</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Basic Tier -->
+            <div class="plan-tier-card">
+              <div class="plan-tier-header">
+                <span class="plan-tier-title">🔹 Plano Basic</span>
+                <span class="plan-tier-tag" style="background:#f3f4f6; color:#4b5563;">Econômico</span>
+              </div>
+              <div class="plan-pill-grid">
+                <button type="button" class="plan-pill-btn" data-plan="basic_7d" onclick="selectPlan('basic_7d')">
+                  <b>7 Dias</b>
+                  <span>R$ 10,90</span>
+                </button>
+                <button type="button" class="plan-pill-btn" data-plan="basic_15d" onclick="selectPlan('basic_15d')">
+                  <b>15 Dias</b>
+                  <span>R$ 14,90</span>
+                </button>
+                <button type="button" class="plan-pill-btn" data-plan="basic_30d" onclick="selectPlan('basic_30d')">
+                  <b>30 Dias</b>
+                  <span>R$ 19,90</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="field"><label class="form-label">Nome completo</label><input type="text" class="form-input" id="coName" placeholder="Pedro Henrique"></div>
           <div class="field"><label class="form-label">E-mail</label><input type="email" class="form-input" id="coEmail" placeholder="seu@email.com"></div>
           <div class="field"><label class="form-label">CPF</label><input type="text" class="form-input" id="coCpf" placeholder="000.000.000-00" maxlength="14"></div>
@@ -141,7 +206,7 @@
             <div class="pix-box">
               <div class="pix-info">
                 <p class="pix-title">Copie o código PIX abaixo:</p>
-                <ol class="pix-steps"><li>Abra o app do seu banco</li><li class="pix-instruction">Cole o código na opção PIX Copia-e-Cola e pague R$ 97,00</li><li>Preencha seus dados acima e clique em "Confirmar pagamento"</li></ol>
+                <ol class="pix-steps"><li>Abra o app do seu banco</li><li class="pix-instruction">Cole o código na opção PIX Copia-e-Cola e pague R$ 54,90</li><li>Preencha seus dados acima e clique em "Confirmar pagamento"</li></ol>
                 <div class="pix-copy-row"><input class="form-input form-input-sm mono" id="pixStr" value="SUA_CHAVE_PIX_AQUI" readonly><button class="btn-sm-purple" id="btnCopyPix" onclick="copyPix()">Copiar</button></div>
               </div>
             </div>
@@ -154,7 +219,7 @@
             <h2 class="summary-title">Resumo do pedido</h2>
             <div class="summary-product">
               <div class="sp-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-              <div><strong>LovableUnlimited</strong><span class="sp-plan">Acesso Vitalício</span></div>
+              <div><strong>LovableUnlimited</strong><span class="sp-plan" id="spSelectedPlan">Vitalício Ilimitado</span></div>
             </div>
             <div class="coupon-section" style="margin-bottom: 1.5rem;">
               <div style="display:flex; gap:0.5rem; align-items:center;">
@@ -164,13 +229,13 @@
               <p id="couponMsg" style="font-size: 0.8rem; margin-top: 0.5rem; display:none;"></p>
             </div>
             <div class="summary-lines">
-              <div class="sl"><span>Subtotal</span><span class="sl-subtotal">R$ 197,00</span></div>
-              <div class="sl sl-discount"><span>Desconto</span><span class="sl-discount-val">−R$ 100,00</span></div>
+              <div class="sl"><span>Subtotal</span><span class="sl-subtotal">R$ 54,90</span></div>
+              <div class="sl sl-discount" style="display:none;"><span>Desconto</span><span class="sl-discount-val">−R$ 0,00</span></div>
               <div class="sl sl-coupon" style="display:none; color: var(--primary);"><span>Cupom aplicado</span><span id="couponDiscountValue"></span></div>
             </div>
             <div class="summary-total-box">
               <div><span class="st-label">Total</span><span class="st-freq">Cobrança única via PIX</span></div>
-              <div class="st-price"><span class="st-curr">R$</span><span class="st-amt">97,00</span></div>
+              <div class="st-price"><span class="st-curr">R$</span><span class="st-amt">54,90</span></div>
             </div>
             <button class="btn-primary btn-block btn-finalize" id="btnFinalize" onclick="submitOrder()">
               <span class="btn-spinner" id="finSpinner" style="display:none"></span>
@@ -286,7 +351,7 @@
       </div>
     </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js?v=20260922_v12"></script>
+  <script src="app.js?v=20260922_v14"></script>
 <script src="experience.js?v=1"></script>
 </body>
 </html>

@@ -256,9 +256,9 @@ function applyLivePreview() {
   mainBtn.style.color = c.btnTextColor;
   mainBtn.style.borderRadius = Math.max(8, c.borderRadius - 12) + 'px';
   brandMark.style.background = c.primaryColor;
-  document.getElementById('pvCardBadge').style.color = c.primaryColor;
-  document.getElementById('pvBalanceAmount').style.color = c.primaryColor;
-  document.getElementById('pvBtnCopy').style.background = c.primaryColor;
+  if (document.getElementById('pvCardBadge')) document.getElementById('pvCardBadge').style.color = c.primaryColor;
+  if (document.getElementById('pvBalanceAmount')) document.getElementById('pvBalanceAmount').style.color = c.primaryColor;
+  if (document.getElementById('pvBtnCopy')) document.getElementById('pvBtnCopy').style.background = c.primaryColor;
 
   // Toggles de Visibilidade
   document.getElementById('pvLogoWrap').style.display = c.showLogo ? 'flex' : 'none';

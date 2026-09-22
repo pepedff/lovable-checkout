@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Status da Entrega — LovableUnlimited</title>
   
-  <meta name="description" content="Acompanhe o status da sua entrega e acesse sua chave/saldo no LovableUnlimited.">
+  <meta name="description" content="Acompanhe o status da sua entrega e acesse sua chave de ativação ilimitada no LovableUnlimited.">
   <meta name="robots" content="noindex, follow">
 
   <!-- ============================================================
@@ -713,24 +713,24 @@
           </div>
         </div>
 
-        <!-- Box com Conteúdo da Entrega (Saldo / Chave / Mensagem) -->
+        <!-- Box com Conteúdo da Entrega (Chave de Acesso Ilimitado) -->
         <div class="delivery-content-box" id="deliveryCardWrap">
-          <span class="content-badge">Dados Entregues</span>
+          <span class="content-badge">Licença Liberada</span>
 
-          <!-- Seção de Saldo -->
-          <div id="secDeliveredBalance" style="display: none;">
-            <div class="balance-display">
-              <div class="balance-amount" id="valDeliveredBalance">500</div>
-              <div class="balance-tag">
-                <strong>Créditos / Saldo</strong>
-                <span>Adicionado com sucesso</span>
+          <!-- Plano Ilimitado Ativado -->
+          <div id="secDeliveredPlan" style="margin-bottom: 16px;">
+            <div style="background: #ffffff; border: 1.5px solid #dcd1f4; border-radius: 14px; padding: 12px 18px; display: inline-flex; align-items: center; gap: 10px;">
+              <span style="font-size: 20px;">👑</span>
+              <div style="text-align: left;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--cfg-primary); text-transform: uppercase;">Acesso Ilimitado Ativado</span>
+                <strong id="valDeliveredPlan" style="display: block; font-size: 14px; color: #1e1b29;">LovableUnlimited · Vitalício Ilimitado</strong>
               </div>
             </div>
           </div>
 
           <!-- Seção de Chave -->
-          <div id="secDeliveredKey" style="display: none;">
-            <p style="font-size: 13px; color: #625575; margin-bottom: 8px; font-weight: 600;">Sua Chave de Ativação:</p>
+          <div id="secDeliveredKey">
+            <p style="font-size: 13px; color: #625575; margin-bottom: 8px; font-weight: 600;">Sua Chave de Ativação / Licença:</p>
             <div class="key-input-wrap">
               <input type="text" id="valDeliveredKey" readonly class="key-input" value="">
               <button class="btn-copy" id="btnCopyKey" onclick="copyValue('valDeliveredKey', 'copyKeyText')">
@@ -898,39 +898,28 @@
             payload = { custom_message: data.delivery_payload };
           }
 
-          // Exibir Saldo
-          if (payload && payload.balance) {
-            document.getElementById('secDeliveredBalance').style.display = 'block';
-            document.getElementById('valDeliveredBalance').textContent = payload.balance;
-            hasContent = true;
-          } else {
-            document.getElementById('secDeliveredBalance').style.display = 'none';
+          // Identificar plano contratado
+          let planLabel = 'LovableUnlimited · Vitalício Ilimitado';
+          if (payload && payload.plan) {
+            planLabel = 'LovableUnlimited · ' + payload.plan;
+          } else if (data.delivery_type) {
+            planLabel = 'LovableUnlimited · ' + data.delivery_type.toUpperCase();
           }
+          const planEl = document.getElementById('valDeliveredPlan');
+          if (planEl) planEl.textContent = planLabel;
 
           // Exibir Chave
-          const activeKey = (payload && payload.key) || data.license_key;
-          if (activeKey) {
-            document.getElementById('secDeliveredKey').style.display = 'block';
-            document.getElementById('valDeliveredKey').value = activeKey;
-            hasContent = true;
-          } else {
-            document.getElementById('secDeliveredKey').style.display = 'none';
-          }
+          const activeKey = (payload && (payload.key || payload.license_key)) || data.license_key || 'ACESSO-VITALICIO-LIBERADO';
+          document.getElementById('secDeliveredKey').style.display = 'block';
+          document.getElementById('valDeliveredKey').value = activeKey;
 
           // Exibir Mensagem Customizada
-          const activeMsg = (payload && payload.custom_message);
+          const activeMsg = (payload && (payload.custom_message || payload.message));
           if (activeMsg) {
             document.getElementById('secDeliveredMessage').style.display = 'block';
             document.getElementById('valDeliveredMessage').textContent = activeMsg;
-            hasContent = true;
           } else {
             document.getElementById('secDeliveredMessage').style.display = 'none';
-          }
-
-          // Se nenhum payload específico estiver preenchido, exibir chave padrão ou aviso de entrega
-          if (!hasContent) {
-            document.getElementById('secDeliveredKey').style.display = 'block';
-            document.getElementById('valDeliveredKey').value = data.license_key || 'ACESSO-VITALICIO-LIBERADO';
           }
 
           showState('delivered');

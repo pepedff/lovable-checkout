@@ -37,7 +37,7 @@ const descriptions={
   users:'Pessoas que fazem parte da sua história.',
   subscriptions:'Acesso, planos e cobranças em um só lugar.',
   payments:'Cada pedido. Cada confirmação.',
-  deliveries:'Fila de despacho de saldos, chaves e mensagens aos clientes.',
+  deliveries:'Fila de despacho de chaves de ativação ilimitadas e mensagens aos clientes.',
   coupons:'Mais possibilidades para suas campanhas.',
   licences:'Gerencie licenças geradas pela integração.',
   logs:'Acompanhe os acontecimentos do sistema.',
@@ -285,8 +285,66 @@ function users(){
 }
 function subscriptions(){
   const list=filteredOrders();
-  const currentPrice = loadedSettings?.product_price || 97;
-  return `<div class="plan-banner"><div><h2>Um pagamento. Acesso vitalício.</h2><p>O plano atual não possui renovação automática. O acesso é liberado após a confirmação do pagamento PIX e entrega.</p></div><strong>${money(currentPrice)}<small>pagamento único</small></strong></div>${toolbar(statusFilter())}<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Plano / valor</th><th>Status</th><th>Próxima cobrança</th><th>Método</th><th>Histórico</th></tr></thead><tbody>${list.map(o=>`<tr><td>${esc(o.name)}<small>${esc(o.email)}</small></td><td>Vitalício · ${money(o.amount || currentPrice)}</td><td>${badge(o.status)}</td><td>Não se aplica</td><td>PIX</td><td><button class="row-action" data-order="${esc(o.id)}">Ver pedido ↗</button></td></tr>`).join('')||'<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>'}</tbody></table></div>`;
+  return `
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:24px;">
+      <!-- Vitalício -->
+      <div style="background:#faf5ff; border:2px solid #7c3aed; border-radius:20px; padding:20px; position:relative;">
+        <span style="position:absolute; top:-10px; right:16px; background:#7c3aed; color:#fff; font-size:10px; font-weight:700; padding:2px 10px; border-radius:12px;">MAIS VENDIDO</span>
+        <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:4px;">👑 Plano Vitalício</div>
+        <div style="font-size:24px; font-weight:800; color:#1e1b29; margin-bottom:10px;">R$ 54,90 <small style="font-size:12px; color:#6b627b; font-weight:500;">pagamento único</small></div>
+        <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Acesso permanente e ilimitado à extensão LovableUnlimited.</p>
+      </div>
+
+      <!-- Pro -->
+      <div style="background:#fff; border:1.5px solid #e4ddec; border-radius:20px; padding:20px;">
+        <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:4px;">⚡ Plano Pro (Ilimitado)</div>
+        <div style="display:flex; gap:8px; margin-top:8px; margin-bottom:10px;">
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 23,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 28,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 36,90</b></div>
+        </div>
+        <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Uso ilimitado com prazos flexíveis.</p>
+      </div>
+
+      <!-- Basic -->
+      <div style="background:#fff; border:1.5px solid #e4ddec; border-radius:20px; padding:20px;">
+        <div style="font-size:12px; font-weight:700; color:#4b5563; text-transform:uppercase; margin-bottom:4px;">🔹 Plano Basic (Econômico)</div>
+        <div style="display:flex; gap:8px; margin-top:8px; margin-bottom:10px;">
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 10,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 14,90</b></div>
+          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 19,90</b></div>
+        </div>
+        <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Entrada acessível para testar a ferramenta.</p>
+      </div>
+    </div>
+
+    ${toolbar(statusFilter())}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Plano / Valor</th>
+            <th>Status</th>
+            <th>Método</th>
+            <th>Data</th>
+            <th>Histórico</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(o=>{
+            let pName = 'Vitalício Ilimitado';
+            try {
+              const p = typeof o.delivery_payload === 'string' ? JSON.parse(o.delivery_payload) : o.delivery_payload;
+              if (p?.plan) pName = p.plan;
+              else if (o.delivery_type) pName = o.delivery_type.toUpperCase();
+            } catch(e){}
+            return `<tr><td>${esc(o.name)}<small>${esc(o.email)}</small></td><td><b>${esc(pName)}</b> · ${money(o.amount)}</td><td>${badge(o.status)}</td><td>PIX</td><td>${date(o.created_at)}</td><td><button class="row-action" data-order="${esc(o.id)}">Ver pedido ↗</button></td></tr>`;
+          }).join('')||'<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 function deliveriesPage(){
   const tabFilter = filterValue('deliveryTab') || 'awaiting';
@@ -341,10 +399,16 @@ function deliveriesPage(){
         <tbody>
           ${pageSlice.map(o => {
             const isDelivered = o.delivery_status === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery');
+            let pName = 'Vitalício Ilimitado';
+            try {
+              const p = typeof o.delivery_payload === 'string' ? JSON.parse(o.delivery_payload) : o.delivery_payload;
+              if (p?.plan) pName = p.plan;
+              else if (o.delivery_type) pName = o.delivery_type.toUpperCase();
+            } catch(e){}
             return `
               <tr>
                 <td><b>${esc(o.name)}</b><small>${esc(o.email)}</small></td>
-                <td>Vitalício · ${money(o.amount)}</td>
+                <td><b>${esc(pName)}</b><br><small style="color:var(--ok); font-weight:600;">${money(o.amount)}</small></td>
                 <td class="mono">${esc(o.protocol)}</td>
                 <td>${date(o.approved_at || o.created_at)}</td>
                 <td>${deliveryBadge(o.delivery_status, o)}</td>
@@ -561,17 +625,19 @@ function orderDetail(id){
   const isPayConfirmed = payStatus === 'payment_confirmed' || o.status === 'approved' || payStatus === 'confirmed';
   const isDelivered = delivStatus === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery');
 
+  let planName = 'Vitalício Ilimitado';
+  try {
+    const p = typeof o.delivery_payload === 'string' ? JSON.parse(o.delivery_payload) : o.delivery_payload;
+    if (p?.plan) planName = p.plan;
+    else if (o.delivery_type) planName = o.delivery_type.toUpperCase();
+  } catch(e){}
+
   let actionsHtml = '';
   if (isPayPending) {
     actionsHtml = `
-      <div class="dialog-actions" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
-        <div style="display:flex; gap:10px; width:100%;">
-          <button class="btn-outline" id="rejectOrder" style="flex:1;">Rejeitar pedido</button>
-          <button class="btn-primary" id="approveOrder" style="flex:1.5;">✓ Confirmar pagamento</button>
-        </div>
-        <button type="button" class="text-button" id="approveNoBalanceOrder" style="font-size:12px; color:var(--text-3); text-align:center; padding:6px; cursor:pointer;">
-          ⚙️ Confirmar sem saldo gratuito (Restrito ao Administrador)
-        </button>
+      <div class="dialog-actions" style="margin-top:20px; display:flex; gap:10px; width:100%;">
+        <button class="btn-outline" id="rejectOrder" style="flex:1;">Rejeitar pedido</button>
+        <button class="btn-primary" id="approveOrder" style="flex:1.5;">✓ Confirmar pagamento</button>
       </div>
     `;
   } else if (isPayConfirmed && !isDelivered) {
@@ -581,7 +647,7 @@ function orderDetail(id){
           Ver tela do cliente ↗
         </a>
         <button class="btn-primary" id="btnGoDeliver" style="flex:1.5; gap:8px;">
-          ⚡ Realizar Entrega de Saldo / Chave
+          ⚡ Realizar Entrega da Chave
         </button>
       </div>
     `;
@@ -605,7 +671,7 @@ function orderDetail(id){
       <div><dt>ID do Pedido</dt><dd class="mono" style="font-size:12px;">${esc(o.id)}</dd></div>
       <div><dt>Cliente</dt><dd>${esc(o.name)}</dd></div>
       <div><dt>E-mail</dt><dd>${esc(o.email)}</dd></div>
-      <div><dt>Produto / Plano</dt><dd>LovableUnlimited · Vitalício</dd></div>
+      <div><dt>Produto / Plano</dt><dd><b style="color:var(--primary);">${esc(planName)}</b></dd></div>
       <div><dt>Valor / Forma</dt><dd>${money(o.amount)} · PIX</dd></div>
       <div><dt>Data do Pedido</dt><dd>${date(o.created_at)}</dd></div>
       <div><dt>Status do Pagamento</dt><dd>${paymentBadge(payStatus)}</dd></div>
@@ -636,8 +702,7 @@ function orderDetail(id){
 
   if (isPayPending) {
     $('rejectOrder').onclick = () => confirmOrder(id, 'rejected');
-    $('approveOrder').onclick = () => promptConfirmPayment(id, false);
-    $('approveNoBalanceOrder').onclick = () => promptConfirmPayment(id, true);
+    $('approveOrder').onclick = () => promptConfirmPayment(id);
   } else if (isPayConfirmed && !isDelivered) {
     $('btnGoDeliver').onclick = () => {
       $('detailDialog').close();
@@ -651,28 +716,34 @@ function orderDetail(id){
   }
 }
 
-function promptConfirmPayment(id, noFreeBalance = false) {
+function promptConfirmPayment(id) {
   $('detailDialog').close();
   const o = orders.find(o => o.id === id);
   if (!o) return;
 
+  let planName = 'Vitalício Ilimitado';
+  try {
+    const p = typeof o.delivery_payload === 'string' ? JSON.parse(o.delivery_payload) : o.delivery_payload;
+    if (p?.plan) planName = p.plan;
+    else if (o.delivery_type) planName = o.delivery_type.toUpperCase();
+  } catch(e){}
+
   modal(`
-    <h2>Confirmar pagamento?</h2>
+    <h2>Confirmar pagamento recebido?</h2>
     <p class="dialog-sub" style="font-size:14px; margin-bottom:14px; line-height:1.5;">
-      ${noFreeBalance
-        ? '⚠️ <b>Atenção (Ação Restrita):</b> Você escolheu confirmar este pagamento <b>sem conceder saldo gratuito</b>. Este pedido será enviado para a fila de entrega.'
-        : 'Este pedido será enviado para a fila de entrega.'}
+      Ao confirmar, o pedido avançará para a fila de <b>Entregas</b> e o cliente verá na tela dele o status "Aguardando entrega".
     </p>
 
     <div style="background:var(--bg-2); border-radius:10px; padding:14px 18px; margin-bottom:20px; font-size:13.5px; border:1px solid var(--border-color);">
       <div style="margin-bottom:4px;"><b>Cliente:</b> ${esc(o.name)} (${esc(o.email)})</div>
-      <div style="margin-bottom:4px;"><b>Valor:</b> ${money(o.amount)} · PIX</div>
+      <div style="margin-bottom:4px;"><b>Plano:</b> <span style="color:var(--primary); font-weight:700;">${esc(planName)}</span></div>
+      <div style="margin-bottom:4px;"><b>Valor pago:</b> ${money(o.amount)} · PIX</div>
       <div><b>Protocolo:</b> <code class="mono">${esc(o.protocol)}</code></div>
     </div>
 
     <div class="dialog-actions">
       <button class="btn-outline" id="cancelConfirmPay">Cancelar</button>
-      <button class="btn-primary" id="btnExecuteConfirmPay">Confirmar pagamento</button>
+      <button class="btn-primary" id="btnExecuteConfirmPay">✓ Confirmar Pagamento</button>
     </div>
   `);
 
@@ -692,17 +763,16 @@ function promptConfirmPayment(id, noFreeBalance = false) {
       } catch(e){}
 
       currentAudit.push({
-        action: noFreeBalance ? 'Pagamento confirmado (sem saldo gratuito)' : 'Pagamento confirmado',
+        action: 'Pagamento confirmado',
         by: userEmail || 'Administrador',
         time: now,
-        note: noFreeBalance ? 'Confirmado sem concessão de saldo gratuito' : 'Enviado para fila de entrega'
+        note: `Pagamento PIX validado pelo Administrador · Enviado para fila de entregas`
       });
 
       const updatePayload = {
         status: 'payment_confirmed',
         payment_status: 'confirmed',
         delivery_status: 'awaiting_delivery',
-        free_balance_granted: !noFreeBalance,
         approved_at: now,
         audit_log: JSON.stringify(currentAudit)
       };
@@ -718,7 +788,7 @@ function promptConfirmPayment(id, noFreeBalance = false) {
 
       Object.assign(o, updatePayload);
       $('detailDialog').close();
-      toast('Pagamento confirmado! O pedido entrou na fila de entrega.');
+      toast('✓ Pagamento confirmado! O pedido está na fila de Entregas.');
       render();
     } catch (e) {
       toast('Erro ao confirmar: ' + e.message, true);
@@ -739,14 +809,22 @@ function openDeliveryModal(id) {
     else if (typeof o.delivery_payload === 'object') parsedPayload = o.delivery_payload || {};
   } catch(e){}
 
+  const planName = parsedPayload.plan || (o.delivery_type ? o.delivery_type.toUpperCase() : 'Vitalício Ilimitado');
+  const isLifetime = planName.toLowerCase().includes('vitalício') || planName.toLowerCase().includes('vitalicio');
+  const balanceStr = lovableBalance !== null ? money(lovableBalance / 100) : 'Carregando…';
+
   modal(`
-    <h2>${isDelivered ? 'Dados da Entrega' : 'Realizar Entrega ao Cliente'}</h2>
+    <h2>${isDelivered ? 'Chave de Acesso Entregue' : 'Entrega da Chave de Acesso'}</h2>
     <p class="dialog-sub">Pedido: <b>${esc(o.protocol)}</b> · Cliente: <b>${esc(o.name)}</b></p>
 
-    <div style="background:var(--bg-2); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; border:1px solid var(--border-color);">
+    <div style="background:var(--bg-2); border-radius:12px; padding:14px 18px; margin-bottom:18px; font-size:13px; border:1px solid var(--border-color);">
       <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
         <span style="color:var(--text-3);">E-mail do cliente:</span>
         <b>${esc(o.email)}</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="color:var(--text-3);">Plano adquirido:</span>
+        <b style="color:var(--primary); font-size:14px;">${esc(planName)}</b>
       </div>
       <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
         <span style="color:var(--text-3);">Valor pago:</span>
@@ -759,11 +837,15 @@ function openDeliveryModal(id) {
     </div>
 
     ${isDelivered ? `
-      <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:12px; padding:18px; margin-bottom:20px;">
-        <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:10px;">Conteúdo Entregue ao Cliente</div>
-        ${parsedPayload.balance ? `<p style="margin-bottom:8px;">💰 <b>Saldo Adicionado:</b> <span style="font-size:16px; font-weight:700; color:#7c3aed;">${esc(parsedPayload.balance)} créditos</span></p>` : ''}
-        ${o.license_key || parsedPayload.key ? `<p style="margin-bottom:8px;">🔑 <b>Chave de Ativação:</b> <code style="background:#fff; padding:4px 8px; border-radius:6px; font-weight:700; border:1px solid #c4b5fd;">${esc(o.license_key || parsedPayload.key)}</code></p>` : ''}
-        ${parsedPayload.message ? `<p style="margin-bottom:8px;">💬 <b>Instruções:</b> ${esc(parsedPayload.message)}</p>` : ''}
+      <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:14px; padding:18px; margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:10px;">
+          🎉 Chave de Acesso Ilimitado Ativa
+        </div>
+        <p style="margin-bottom:10px;">
+          🔑 <b>Chave Entregue:</b> 
+          <code style="background:#fff; padding:6px 12px; border-radius:8px; font-weight:700; border:1px solid #c4b5fd; font-size:14px; display:inline-block; margin-top:4px;">${esc(o.license_key || parsedPayload.key)}</code>
+        </p>
+        ${parsedPayload.message ? `<p style="margin-bottom:8px; font-size:13px;">💬 <b>Instruções:</b> ${esc(parsedPayload.message)}</p>` : ''}
         <div style="font-size:12px; color:var(--text-3); margin-top:12px; border-top:1px dashed #c4b5fd; padding-top:8px;">
           Entregue em: <b>${date(o.delivered_at)}</b> por <b>${esc(o.delivered_by || 'Admin')}</b>
         </div>
@@ -774,46 +856,45 @@ function openDeliveryModal(id) {
         </a>
       </div>
     ` : `
+      <!-- Status do Saldo na API Lovable do Admin -->
+      <div style="background:#fcfaff; border:1.5px solid #dcd1f4; border-radius:14px; padding:14px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.04em;">Seu Saldo na API Lovable</div>
+          <div style="font-size:17px; font-weight:800; color:#1e1b29; margin-top:2px;" id="lblModalLovableBalance">${balanceStr}</div>
+          <small style="font-size:11px; color:#6b627b;">Saldo necessário para gerar a chave pela API oficial</small>
+        </div>
+        <button type="button" class="btn-outline" id="btnRefreshBalModal" style="font-size:12px; padding:6px 12px;">
+          🔄 Atualizar Saldo
+        </button>
+      </div>
+
+      <div id="modalApiErrorBox" style="display:none; background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:10px 14px; border-radius:10px; font-size:12.5px; margin-bottom:14px; line-height:1.5;"></div>
+
       <form id="deliveryForm">
         <div style="margin-bottom:16px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Tipo de Entrega</label>
-          <div style="display:flex; gap:10px;">
-            <label style="flex:1; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:var(--bg-2); padding:10px; border-radius:8px; border:1px solid var(--border-color);">
-              <input type="radio" name="delivType" value="key" checked> Chave Vitalícia
-            </label>
-            <label style="flex:1; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:var(--bg-2); padding:10px; border-radius:8px; border:1px solid var(--border-color);">
-              <input type="radio" name="delivType" value="balance"> Saldo / Créditos
-            </label>
-            <label style="flex:1; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:var(--bg-2); padding:10px; border-radius:8px; border:1px solid var(--border-color);">
-              <input type="radio" name="delivType" value="custom"> Chave + Saldo
-            </label>
+          <label style="font-weight:700; font-size:13px; display:block; margin-bottom:6px;">Chave de Acesso / Licença Ilimitada:</label>
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <input type="text" id="inputDeliveryKey" placeholder="Cole ou gere a chave..." value="${esc(o.license_key || '')}" style="flex:1;" required>
+            <button type="button" class="btn-outline" id="btnGenRandomKey" style="font-size:12px; white-space:nowrap;" title="Gera um código local">Gerar Código Rápido</button>
           </div>
-        </div>
-
-        <div id="fieldKey" style="margin-bottom:14px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Chave de Ativação / Token:</label>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="inputDeliveryKey" placeholder="Ex: LVBL-VITALICIO-XXXX-XXXX" value="${esc(o.license_key || '')}" style="flex:1;">
-            <button type="button" class="btn-outline" id="btnGenRandomKey" style="font-size:12px; white-space:nowrap;">Gerar Chave</button>
-          </div>
-          <small style="color:var(--text-3); font-size:11px; margin-top:4px; display:block;">O cliente poderá copiar esta chave com um clique na tela de entrega.</small>
-        </div>
-
-        <div id="fieldBalance" style="margin-bottom:14px; display:none;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Quantidade de Saldo / Créditos:</label>
-          <input type="number" id="inputDeliveryBalance" min="0" placeholder="Ex: 500" value="500">
-          <small style="color:var(--text-3); font-size:11px; margin-top:4px; display:block;">Quantidade de créditos ou saldo que o cliente receberá.</small>
+          
+          <button type="button" class="btn-primary" id="btnGenerateViaApi" style="width:100%; font-size:12.5px; padding:9px 14px; background:#7c3aed; border-color:#7c3aed; gap:6px; margin-top:4px;">
+            ⚡ Gerar Chave Oficial na API Lovable (${isLifetime ? 'Vitalício' : '30 Dias'})
+          </button>
+          <small style="color:var(--text-3); font-size:11px; margin-top:6px; display:block;">
+            Se o seu saldo na API Lovable estiver carregado, clique acima para gerar a chave oficial. Se preferir, cole sua chave no campo acima.
+          </small>
         </div>
 
         <div style="margin-bottom:18px;">
-          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Informações / Instruções da Entrega (Opcional):</label>
-          <textarea id="inputDeliveryMsg" rows="3" placeholder="Ex: Sua licença vitalícia foi liberada com sucesso! Siga as instruções da extensão para ativar."></textarea>
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Instruções adicionais (Opcional):</label>
+          <textarea id="inputDeliveryMsg" rows="2" placeholder="Ex: Seu acesso ilimitado foi ativado! Copie sua chave e insira na extensão."></textarea>
         </div>
 
         <div class="dialog-actions">
           <button type="button" class="btn-outline" onclick="$('detailDialog').close()">Cancelar</button>
           <button type="submit" class="btn-primary" id="btnSubmitDelivery" style="flex:1.5; gap:8px;">
-            🚀 Entregar
+            🚀 Entregar Chave ao Cliente
           </button>
         </div>
       </form>
@@ -821,63 +902,97 @@ function openDeliveryModal(id) {
   `, true);
 
   if (!isDelivered) {
-    const radios = document.querySelectorAll('input[name="delivType"]');
-    const fKey = $('fieldKey');
-    const fBal = $('fieldBalance');
-    radios.forEach(r => r.onchange = () => {
-      if (r.value === 'key') {
-        fKey.style.display = 'block';
-        fBal.style.display = 'none';
-      } else if (r.value === 'balance') {
-        fKey.style.display = 'none';
-        fBal.style.display = 'block';
-      } else {
-        fKey.style.display = 'block';
-        fBal.style.display = 'block';
-      }
-    });
+    if ($('btnRefreshBalModal')) {
+      $('btnRefreshBalModal').onclick = async () => {
+        const btn = $('btnRefreshBalModal');
+        btn.disabled = true;
+        btn.textContent = 'Consultando…';
+        await loadLovableData();
+        if ($('lblModalLovableBalance')) {
+          $('lblModalLovableBalance').textContent = lovableBalance !== null ? money(lovableBalance / 100) : '—';
+        }
+        btn.disabled = false;
+        btn.textContent = '🔄 Atualizar Saldo';
+        toast('Saldo da API Lovable atualizado!');
+      };
+    }
+
+    if ($('btnGenerateViaApi')) {
+      $('btnGenerateViaApi').onclick = async () => {
+        const btn = $('btnGenerateViaApi');
+        const errBox = $('modalApiErrorBox');
+        errBox.style.display = 'none';
+        btn.disabled = true;
+        btn.textContent = 'Consultando API Lovable…';
+        try {
+          const apiKey = loadedSettings?.lovable_api_key;
+          if (!apiKey) throw new Error('API Key da Lovable não configurada. Configure em Configurações > Integrações.');
+
+          const res = await fetch('https://rest.lovableup.online/api/v1/create-licence', {
+            method: 'POST',
+            headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: isLifetime ? 'lifetime' : 'basic_30d' })
+          });
+          const data = await res.json();
+          if (!data.success) {
+            if (data.error && (data.error.toLowerCase().includes('saldo') || data.error.toLowerCase().includes('balance'))) {
+              throw new Error('⚠️ Saldo insuficiente na sua conta Lovable para gerar esta chave. Recarregue seu saldo na API Lovable ou digite a chave manualmente no campo acima.');
+            }
+            throw new Error(data.error || 'Erro ao gerar licença na API.');
+          }
+          $('inputDeliveryKey').value = data.chave_token;
+          toast('✓ Chave gerada com sucesso pela API Lovable!');
+          await loadLovableData();
+          if ($('lblModalLovableBalance') && lovableBalance !== null) {
+            $('lblModalLovableBalance').textContent = money(lovableBalance / 100);
+          }
+        } catch(e) {
+          errBox.style.display = 'block';
+          errBox.textContent = e.message;
+          toast(e.message, true);
+        } finally {
+          btn.disabled = false;
+          btn.textContent = `⚡ Gerar Chave Oficial na API Lovable (${isLifetime ? 'Vitalício' : '30 Dias'})`;
+        }
+      };
+    }
 
     $('btnGenRandomKey').onclick = () => {
       const part = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-      $('inputDeliveryKey').value = `LVBL-${part()}-${part()}-${part()}`;
+      const prefix = isLifetime ? 'VITALICIO' : 'PRO';
+      $('inputDeliveryKey').value = `LVBL-${prefix}-${part()}-${part()}`;
     };
 
     $('deliveryForm').onsubmit = (e) => {
       e.preventDefault();
-      const type = document.querySelector('input[name="delivType"]:checked').value;
       const key = $('inputDeliveryKey')?.value.trim() || '';
-      const balance = $('inputDeliveryBalance')?.value.trim() || '';
       const msg = $('inputDeliveryMsg')?.value.trim() || '';
 
-      if (type === 'key' && !key) {
-        toast('Informe a chave de ativação para continuar.', true);
-        return;
-      }
-      if (type === 'balance' && !balance) {
-        toast('Informe a quantidade de saldo para continuar.', true);
+      if (!key) {
+        toast('Informe ou gere a chave de ativação para continuar.', true);
         return;
       }
 
-      promptConfirmDelivery(id, { type, key, balance, msg });
+      promptConfirmDelivery(id, { plan: planName, key, msg });
     };
   }
 }
 
-function promptConfirmDelivery(id, { type, key, balance, msg }) {
+function promptConfirmDelivery(id, { plan, key, msg }) {
   $('detailDialog').close();
   const o = orders.find(o => o.id === id);
   if (!o) return;
 
   modal(`
-    <h2>Confirmar entrega?</h2>
+    <h2>Confirmar entrega da chave?</h2>
     <p class="dialog-sub" style="font-size:14px; margin-bottom:16px;">
-      Após confirmar, o cliente poderá visualizar os dados entregues em tempo real.
+      Após confirmar, o cliente poderá visualizar sua chave de ativação ilimitada em tempo real.
     </p>
 
     <div style="background:var(--bg-2); border-radius:10px; padding:14px 18px; margin-bottom:20px; font-size:13px; border:1px solid var(--border-color);">
       <div style="margin-bottom:4px;"><b>Cliente:</b> ${esc(o.name)} (${esc(o.email)})</div>
-      ${key ? `<div style="margin-bottom:4px;"><b>Chave de ativação:</b> <code style="font-weight:700;">${esc(key)}</code></div>` : ''}
-      ${balance ? `<div style="margin-bottom:4px;"><b>Saldo:</b> ${esc(balance)} créditos</div>` : ''}
+      <div style="margin-bottom:4px;"><b>Plano:</b> <span style="color:var(--primary); font-weight:700;">${esc(plan)}</span></div>
+      <div style="margin-bottom:4px;"><b>Chave de ativação:</b> <code style="font-weight:700; color:var(--primary); font-size:14px;">${esc(key)}</code></div>
       ${msg ? `<div><b>Instruções:</b> ${esc(msg)}</div>` : ''}
     </div>
 
@@ -907,22 +1022,16 @@ function promptConfirmDelivery(id, { type, key, balance, msg }) {
         else if (Array.isArray(o.audit_log)) currentAudit = [...o.audit_log];
       } catch(e){}
 
-      let summaryText = [];
-      if (balance) summaryText.push(`Saldo adicionado: ${balance}`);
-      if (key) summaryText.push(`Chave gerada: ${key}`);
-      if (msg) summaryText.push('Instruções incluídas');
-
       currentAudit.push({
-        action: 'Entrega concluída',
+        action: 'Entrega de chave concluída',
         by: userEmail || 'Administrador',
         time: now,
-        note: summaryText.join(' · ') || 'Entrega manual realizada'
+        note: `Chave: ${key} · Plano: ${plan}`
       });
 
       const deliveryPayloadObj = {
-        type,
-        key: key || undefined,
-        balance: balance || undefined,
+        plan,
+        key,
         message: msg || undefined,
         delivered_at: now,
         delivered_by: userEmail || 'Administrador'
@@ -931,29 +1040,24 @@ function promptConfirmDelivery(id, { type, key, balance, msg }) {
       const updatePayload = {
         delivery_status: 'delivered',
         status: 'approved',
-        delivery_type: type,
+        license_key: key,
         delivery_payload: JSON.stringify(deliveryPayloadObj),
         delivered_at: now,
         delivered_by: userEmail || 'Administrador',
         audit_log: JSON.stringify(currentAudit)
       };
 
-      if (key) {
-        updatePayload.license_key = key;
-      }
-
       const { data, error } = await client.from('orders').update(updatePayload).eq('id', id).select('id').single();
       if (error) {
         console.warn('Fallback update for orders:', error);
-        const fbPayload = { status: 'approved', license_key: key || o.license_key || 'LVBL-DELIVERED' };
+        const fbPayload = { status: 'approved', license_key: key };
         const { error: fbErr } = await client.from('orders').update(fbPayload).eq('id', id);
         if (fbErr) throw fbErr;
-        updatePayload.license_key = fbPayload.license_key;
       }
 
       Object.assign(o, updatePayload);
       $('detailDialog').close();
-      toast('🎉 Entrega concluída com sucesso! O cliente já pode visualizar.');
+      toast('🎉 Chave entregue com sucesso! O cliente já pode visualizar.');
       render();
     } catch (e) {
       toast('Não foi possível entregar: ' + e.message, true);

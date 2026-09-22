@@ -206,7 +206,8 @@ async function submitOrder() {
   try {
     if (supabaseClient && SUPABASE_URL !== 'https://SEU_PROJETO.supabase.co') {
       // Salvar no Supabase
-      const finalAmount = currentCoupon ? Math.max(0, basePrice * (1 - currentCoupon.discount / 100)) : basePrice;
+      const planObj = (typeof PLANS !== 'undefined' && PLANS[selectedPlanKey]) ? PLANS[selectedPlanKey] : { id: 'vitalicio', name: 'Vitalício Ilimitado', category: 'Vitalício', duration: 'Vitalício', price: basePrice };
+      const finalAmount = currentCoupon ? Math.max(0, planObj.price * (1 - currentCoupon.discount / 100)) : planObj.price;
       const { data, error } = await supabaseClient
         .from('orders')
         .insert([{
@@ -215,7 +216,16 @@ async function submitOrder() {
           cpf: cpf.replace(/\D/g, ''),
           amount: finalAmount,
           status: 'pending',
+          payment_status: 'pending',
+          delivery_status: 'pending',
           protocol: protocol,
+          delivery_type: planObj.id,
+          delivery_payload: JSON.stringify({
+            plan: planObj.name,
+            category: planObj.category,
+            duration: planObj.duration,
+            price: planObj.price
+          }),
           download_count: 0
         }]);
 
@@ -227,7 +237,7 @@ async function submitOrder() {
           await supabaseClient.from('logs').insert([{
             event_type: 'Checkout',
             user_email: email,
-            description: `Novo pedido via PIX (R$ ${finalAmount.toLocaleString('pt-BR',{minimumFractionDigits:2})})`,
+            description: `Novo pedido via PIX: ${planObj.name} (R$ ${finalAmount.toLocaleString('pt-BR',{minimumFractionDigits:2})})`,
             status: 'Sucesso'
           }]);
         } catch(e){}
@@ -447,8 +457,38 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDynamicSettings();
 });
 
-let basePrice = 97;
+const PLANS = {
+  vitalicio: { id: 'vitalicio', category: 'Vitalício', duration: 'Vitalício', price: 54.90, name: 'Vitalício Ilimitado' },
+  pro_7d: { id: 'pro_7d', category: 'Pro', duration: '7 Dias', price: 23.90, name: 'Pro (7 Dias)' },
+  pro_15d: { id: 'pro_15d', category: 'Pro', duration: '15 Dias', price: 28.90, name: 'Pro (15 Dias)' },
+  pro_30d: { id: 'pro_30d', category: 'Pro', duration: '30 Dias', price: 36.90, name: 'Pro (30 Dias)' },
+  basic_7d: { id: 'basic_7d', category: 'Basic', duration: '7 Dias', price: 10.90, name: 'Basic (7 Dias)' },
+  basic_15d: { id: 'basic_15d', category: 'Basic', duration: '15 Dias', price: 14.90, name: 'Basic (15 Dias)' },
+  basic_30d: { id: 'basic_30d', category: 'Basic', duration: '30 Dias', price: 19.90, name: 'Basic (30 Dias)' }
+};
+
+let selectedPlanKey = 'vitalicio';
+let basePrice = 54.90;
 let currentCoupon = null;
+
+function selectPlan(planKey) {
+  if (!PLANS[planKey]) return;
+  selectedPlanKey = planKey;
+  const plan = PLANS[planKey];
+  basePrice = plan.price;
+
+  const heroCard = document.getElementById('cardVitalicio');
+  if (heroCard) heroCard.classList.toggle('active', planKey === 'vitalicio');
+
+  document.querySelectorAll('.plan-pill-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.plan === planKey);
+  });
+
+  const nameEl = document.getElementById('spSelectedPlan');
+  if (nameEl) nameEl.textContent = plan.name;
+
+  updateCheckoutPrice();
+}
 
 async function applyCoupon() {
   const input = document.getElementById('couponInput');
@@ -548,7 +588,10 @@ async function loadDynamicSettings() {
           if (pixEl) pixEl.value = data.pix_key;
         }
         if (data.product_price) {
-          basePrice = Number(data.product_price);
+          PLANS.vitalicio.price = Number(data.product_price);
+          if (selectedPlanKey === 'vitalicio') {
+            basePrice = Number(data.product_price);
+          }
           document.querySelectorAll('.sl-discount').forEach(el => el.style.display = 'none');
           updateCheckoutPrice();
         }
