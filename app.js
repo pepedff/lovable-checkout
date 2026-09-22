@@ -516,6 +516,9 @@ function updateCheckoutPrice() {
     document.querySelectorAll('.pix-instruction').forEach(li => {
       li.innerHTML = `Cole o código na opção PIX Copia-e-Cola e pague R$ ${formattedFinal}`;
     });
+
+    const srPriceEl = document.getElementById('srPrice');
+    if (srPriceEl) srPriceEl.textContent = `R$ ${formattedFinal}`;
   } else {
     if (couponEl) couponEl.style.display = 'none';
     totalEls.forEach(e => e.textContent = formattedBase);
@@ -523,6 +526,9 @@ function updateCheckoutPrice() {
     document.querySelectorAll('.pix-instruction').forEach(li => {
       li.innerHTML = `Cole o código na opção PIX Copia-e-Cola e pague R$ ${formattedBase}`;
     });
+
+    const srPriceEl = document.getElementById('srPrice');
+    if (srPriceEl) srPriceEl.textContent = `R$ ${formattedBase}`;
   }
 }
 

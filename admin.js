@@ -89,6 +89,7 @@ function showPanel(){
   $('adminPanel').hidden=false;
   $('connectionBanner').className='connection-banner';
   $('connectionBanner').textContent='Ambiente conectado · Pedidos e configurações do Supabase diretamente aplicados.';
+  loadSettings();
   navigate('dashboard');
 }
 async function login(e){
@@ -192,6 +193,7 @@ async function navigate(next){
   });
   closeSidebar();
   $('adminContent').innerHTML='<div class="skeleton-row"><div></div><div></div><div></div></div><div class="skeleton-chart"></div>';
+  if(!loadedSettings)await loadSettings();
   if(['dashboard','users','payments','subscriptions','deliveries'].includes(tab))await fetchOrders();
   if(tab==='coupons')await fetchCoupons();
   if(tab==='logs')await fetchLogs();
@@ -283,7 +285,8 @@ function users(){
 }
 function subscriptions(){
   const list=filteredOrders();
-  return `<div class="plan-banner"><div><h2>Um pagamento. Acesso vitalício.</h2><p>O plano atual não possui renovação automática. O acesso é liberado após a confirmação do pagamento PIX e entrega.</p></div><strong>R$ 97<small>pagamento único</small></strong></div>${toolbar(statusFilter())}<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Plano / valor</th><th>Status</th><th>Próxima cobrança</th><th>Método</th><th>Histórico</th></tr></thead><tbody>${list.map(o=>`<tr><td>${esc(o.name)}<small>${esc(o.email)}</small></td><td>Vitalício · ${money(o.amount)}</td><td>${badge(o.status)}</td><td>Não se aplica</td><td>PIX</td><td><button class="row-action" data-order="${esc(o.id)}">Ver pedido ↗</button></td></tr>`).join('')||'<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>'}</tbody></table></div>`;
+  const currentPrice = loadedSettings?.product_price || 97;
+  return `<div class="plan-banner"><div><h2>Um pagamento. Acesso vitalício.</h2><p>O plano atual não possui renovação automática. O acesso é liberado após a confirmação do pagamento PIX e entrega.</p></div><strong>${money(currentPrice)}<small>pagamento único</small></strong></div>${toolbar(statusFilter())}<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Plano / valor</th><th>Status</th><th>Próxima cobrança</th><th>Método</th><th>Histórico</th></tr></thead><tbody>${list.map(o=>`<tr><td>${esc(o.name)}<small>${esc(o.email)}</small></td><td>Vitalício · ${money(o.amount || currentPrice)}</td><td>${badge(o.status)}</td><td>Não se aplica</td><td>PIX</td><td><button class="row-action" data-order="${esc(o.id)}">Ver pedido ↗</button></td></tr>`).join('')||'<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>'}</tbody></table></div>`;
 }
 function deliveriesPage(){
   const tabFilter = filterValue('deliveryTab') || 'awaiting';
@@ -509,8 +512,13 @@ async function loadSettings(){
     const {data,error}=await client.from('settings').select('*').single();
     if(!authorized||requestVersion!==routeVersion)return;
     if(error)throw error;
-    loadedSettings=data;
-    if(tab==='settings')render();
+    if(data){
+      if(data.product_price!==undefined&&data.product_price!==null){
+        data.product_price=Number(data.product_price);
+      }
+      loadedSettings=data;
+    }
+    render();
   }catch{
     toast('Configurações indisponíveis. Tente atualizar antes de editar.',true);
   }
@@ -1169,6 +1177,9 @@ function bindContent(){
     e.preventDefault();
     const f=new FormData(e.target);
     const values=Object.fromEntries(f.entries());
+    if(values.product_price!==undefined){
+      values.product_price=Number(values.product_price);
+    }
     if(values.download_url){
       if(!/^(https:\/\/[^\s]+|[a-zA-Z0-9_.\/-]+)$/.test(values.download_url)||values.download_url.startsWith('//')){
         toast('Use um arquivo local ou URL HTTPS válido.',true);
