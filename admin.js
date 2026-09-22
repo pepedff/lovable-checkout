@@ -3,49 +3,390 @@ const $=id=>document.getElementById(id);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const date=d=>d?new Date(d).toLocaleDateString('pt-BR'):'Não disponível';
-const icons={dashboard:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 21v-2a4 4 0 0 0-3-4',subscriptions:'M4 6h16v14H4z M8 3v6 M16 3v6 M4 11h16',payments:'M3 5h18v14H3z M3 10h18 M7 15h4',coupons:'M3 4h9l9 9-8 8-10-10z M8 8h.01',licences:'M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3 M8 12h8',logs:'M5 3h14v18H5z M9 8h6 M9 12h6 M9 16h4',settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8 M12 2v3 M12 19v3 M2 12h3 M19 12h3 M5 5l2 2 M17 17l2 2 M5 19l2-2 M17 7l2-2',search:'M21 21l-6-6 M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14',bell:'M5 17h14l-2-3V9a5 5 0 0 0-10 0v5z M10 21h4'};
+const icons={
+  dashboard:'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
+  users:'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 21v-2a4 4 0 0 0-3-4',
+  subscriptions:'M4 6h16v14H4z M8 3v6 M16 3v6 M4 11h16',
+  payments:'M3 5h18v14H3z M3 10h18 M7 15h4',
+  deliveries:'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z M3.27 6.96L12 12.01l8.73-5.05 M12 22.08V12',
+  coupons:'M3 4h9l9 9-8 8-10-10z M8 8h.01',
+  licences:'M15 7h3a5 5 0 0 1 5 5 5 5 0 0 1-5 5h-3m-6 0H6a5 5 0 0 1-5-5 5 5 0 0 1 5-5h3 M8 12h8',
+  logs:'M5 3h14v18H5z M9 8h6 M9 12h6 M9 16h4',
+  settings:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8 M12 2v3 M12 19v3 M2 12h3 M19 12h3 M5 5l2 2 M17 17l2 2 M5 19l2-2 M17 7l2-2',
+  search:'M21 21l-6-6 M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14',
+  bell:'M5 17h14l-2-3V9a5 5 0 0 0-10 0v5z M10 21h4'
+};
 const icon=name=>`<svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${icons[name]||icons.dashboard}"/></svg>`;
-const routes={dashboard:'Dashboard',users:'Usuários',subscriptions:'Assinaturas',payments:'Pagamentos',coupons:'Cupons',licences:'Licenças',logs:'Logs',settings:'Configurações'};
+const routes={
+  dashboard:'Dashboard',
+  users:'Usuários',
+  subscriptions:'Assinaturas',
+  payments:'Pagamentos',
+  deliveries:'Entregas',
+  coupons:'Cupons',
+  licences:'Licenças',
+  logs:'Logs',
+  settings:'Configurações'
+};
 let client=null;try{client=window.supabase?.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)}catch{}
 let authorized=false,userEmail='',orders=[],tab='dashboard',loadError='',page=1,selection=new Set(),settingCategory='Geral',loadedSettings=null;
 let filters={};try{filters=JSON.parse(sessionStorage.getItem('lu-admin-filters')||'{}')}catch{}
 let coupons=[],logs=[],lovableBalance=null,lovableLicences=[];
-const descriptions={dashboard:'Seu negócio, em perspectiva.',users:'Pessoas que fazem parte da sua história.',subscriptions:'Acesso, planos e cobranças em um só lugar.',payments:'Cada pedido. Cada confirmação.',coupons:'Mais possibilidades para suas campanhas.',licences:'Gerencie licenças geradas pela integração.',logs:'Acompanhe os acontecimentos do sistema.',settings:'Seu produto, do seu jeito.'};
+const descriptions={
+  dashboard:'Seu negócio, em perspectiva.',
+  users:'Pessoas que fazem parte da sua história.',
+  subscriptions:'Acesso, planos e cobranças em um só lugar.',
+  payments:'Cada pedido. Cada confirmação.',
+  deliveries:'Fila de despacho de saldos, chaves e mensagens aos clientes.',
+  coupons:'Mais possibilidades para suas campanhas.',
+  licences:'Gerencie licenças geradas pela integração.',
+  logs:'Acompanhe os acontecimentos do sistema.',
+  settings:'Seu produto, do seu jeito.'
+};
 function toast(text,error=false){$('toast').textContent=text;$('toast').className='toast'+(error?' toast-error':'');$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,4500)}
 function isAdmin(user){return true;}
 function sampleOrders(){return []}
 function initDemoModules(){}
 function moduleNotice(){return ''}
 function empty(title,text){return `<div class="empty-state">${icon('search')}<h3>${esc(title)}</h3><p>${esc(text)}</p></div>`}
-function badge(status){const map={approved:['Ativo','ok'],pending:['Pendente','pending'],rejected:['Rejeitado','bad'],failed:['Falhou','bad'],cancelled:['Cancelado','neutral']};const [label,kind]=map[status]||[status,'neutral'];return `<span class="badge ${kind}">${esc(label)}</span>`}
-function modal(content,wide=false){$('dialogContent').innerHTML=`<button class="dialog-close icon-button" aria-label="Fechar">×</button>${content}`;$('detailDialog').classList.toggle('wide-dialog',wide);const heading=$('dialogContent').querySelector('h2');if(heading){heading.id='dialogTitle';$('detailDialog').setAttribute('aria-labelledby','dialogTitle')}$('detailDialog').showModal();$('dialogContent').querySelector('.dialog-close').onclick=()=>$('detailDialog').close()}
-function showPanel(){ $('loginScreen').hidden=true;$('adminPanel').hidden=false;$('connectionBanner').className='connection-banner';$('connectionBanner').textContent='Ambiente conectado · Pedidos e configurações do Supabase diretamente aplicados.';navigate('dashboard') }
-async function login(e){e.preventDefault();$('loginError').hidden=true;$('btnLogin').disabled=true;$('btnLogin').textContent='Verificando acesso…';try{if(!client)throw new Error('Serviço de autenticação indisponível. Tente novamente mais tarde.');const {data,error}=await client.auth.signInWithPassword({email:$('loginEmail').value,password:$('loginPassword').value});if(error)throw error;if(!isAdmin(data.user)){await client.auth.signOut();throw new Error('Esta conta não possui a função de administrador. Solicite acesso à equipe responsável.')}authorized=true;userEmail=data.user.email;$('loginPassword').value='';showPanel()}catch(e){$('loginError').textContent=e.message;$('loginError').hidden=false}finally{$('btnLogin').disabled=false;$('btnLogin').textContent='Entrar no painel →'}}
-async function fetchOrders(){loadError='';if(!authorized||!client){loadError='Acesso administrativo indisponível.';return}const requestVersion=routeVersion;try{const {data,error}=await client.from('orders').select('*').order('created_at',{ascending:false});if(!authorized||requestVersion!==routeVersion)return;if(error)throw error;orders=data||[]}catch(e){orders=[];loadError='Não foi possível carregar os pedidos.';toast(loadError,true)}}
-async function fetchCoupons(){loadError='';if(!authorized||!client)return;const requestVersion=routeVersion;try{const {data,error}=await client.from('coupons').select('*').order('created_at',{ascending:false});if(!authorized||requestVersion!==routeVersion)return;if(error)throw error;coupons=data||[]}catch(e){coupons=[];loadError='Não foi possível carregar os cupons.';toast(loadError,true)}}
-async function fetchLogs(){loadError='';if(!authorized||!client)return;const requestVersion=routeVersion;try{const {data,error}=await client.from('system_logs').select('*').order('created_at',{ascending:false});if(!authorized||requestVersion!==routeVersion)return;if(error)throw error;logs=data||[]}catch(e){logs=[];loadError='Não foi possível carregar os logs.';toast(loadError,true)}}
-async function loadLovableData(){const apiKey=loadedSettings?.lovable_api_key;if(!apiKey){lovableBalance=null;lovableLicences=[];return;}try{const [resBal,resLic]=await Promise.all([fetch('https://rest.lovableup.online/api/v1/balance',{headers:{'x-api-key':apiKey}}),fetch('https://rest.lovableup.online/api/v1/all-licences',{headers:{'x-api-key':apiKey}})]);if(resBal.ok)lovableBalance=(await resBal.json()).balance;if(resLic.ok)lovableLicences=(await resLic.json()).licences;}catch(e){console.warn('Erro Lovable',e);toast('Erro ao contatar API Lovable.',true);}}
+function badge(status, kindOverride){
+  const map={
+    approved:['Aprovado','ok'],
+    payment_confirmed:['Pagamento confirmado','purple'],
+    awaiting_delivery:['Aguardando entrega','blue'],
+    preparing_delivery:['Preparando entrega','blue'],
+    delivered:['Entregue','ok'],
+    pending:['Pendente','pending'],
+    rejected:['Rejeitado','bad'],
+    failed:['Falhou','bad'],
+    cancelled:['Cancelado','neutral'],
+    refunded:['Reembolsado','bad']
+  };
+  const [label,kind]=map[status]||[status,'neutral'];
+  return `<span class="badge ${kindOverride||kind}">${esc(label)}</span>`;
+}
+function paymentBadge(status){
+  if(status==='approved'||status==='payment_confirmed') return '<span class="badge purple">Confirmado</span>';
+  if(status==='pending') return '<span class="badge pending">Aguardando confirmação</span>';
+  return badge(status);
+}
+function deliveryBadge(delivStatus, o){
+  if(delivStatus==='delivered'||(o?.status==='approved'&&o?.license_key&&o?.delivery_status!=='awaiting_delivery')) return '<span class="badge ok">Entregue</span>';
+  if(delivStatus==='preparing_delivery') return '<span class="badge blue">Preparando</span>';
+  if(delivStatus==='awaiting_delivery'||o?.status==='approved'||o?.status==='payment_confirmed'||o?.payment_status==='confirmed') return '<span class="badge blue">Aguardando entrega</span>';
+  return '<span class="badge neutral">Pendente</span>';
+}
+function modal(content,wide=false){
+  $('dialogContent').innerHTML=`<button class="dialog-close icon-button" aria-label="Fechar">×</button>${content}`;
+  $('detailDialog').classList.toggle('wide-dialog',wide);
+  const heading=$('dialogContent').querySelector('h2');
+  if(heading){heading.id='dialogTitle';$('detailDialog').setAttribute('aria-labelledby','dialogTitle')}
+  $('detailDialog').showModal();
+  $('dialogContent').querySelector('.dialog-close').onclick=()=>$('detailDialog').close();
+}
+function showPanel(){
+  $('loginScreen').hidden=true;
+  $('adminPanel').hidden=false;
+  $('connectionBanner').className='connection-banner';
+  $('connectionBanner').textContent='Ambiente conectado · Pedidos e configurações do Supabase diretamente aplicados.';
+  navigate('dashboard');
+}
+async function login(e){
+  e.preventDefault();
+  $('loginError').hidden=true;
+  $('btnLogin').disabled=true;
+  $('btnLogin').textContent='Verificando acesso…';
+  try{
+    if(!client)throw new Error('Serviço de autenticação indisponível. Tente novamente mais tarde.');
+    const {data,error}=await client.auth.signInWithPassword({email:$('loginEmail').value,password:$('loginPassword').value});
+    if(error)throw error;
+    if(!isAdmin(data.user)){
+      await client.auth.signOut();
+      throw new Error('Esta conta não possui a função de administrador. Solicite acesso à equipe responsável.');
+    }
+    authorized=true;
+    userEmail=data.user.email;
+    $('loginPassword').value='';
+    showPanel();
+  }catch(e){
+    $('loginError').textContent=e.message;
+    $('loginError').hidden=false;
+  }finally{
+    $('btnLogin').disabled=false;
+    $('btnLogin').textContent='Entrar no painel →';
+  }
+}
+async function fetchOrders(){
+  loadError='';
+  if(!authorized||!client){loadError='Acesso administrativo indisponível.';return}
+  const requestVersion=routeVersion;
+  try{
+    const {data,error}=await client.from('orders').select('*').order('created_at',{ascending:false});
+    if(!authorized||requestVersion!==routeVersion)return;
+    if(error)throw error;
+    orders=data||[];
+  }catch(e){
+    orders=[];
+    loadError='Não foi possível carregar os pedidos.';
+    toast(loadError,true);
+  }
+}
+async function fetchCoupons(){
+  loadError='';
+  if(!authorized||!client)return;
+  const requestVersion=routeVersion;
+  try{
+    const {data,error}=await client.from('coupons').select('*').order('created_at',{ascending:false});
+    if(!authorized||requestVersion!==routeVersion)return;
+    if(error)throw error;
+    coupons=data||[];
+  }catch(e){
+    coupons=[];
+    loadError='Não foi possível carregar os cupons.';
+    toast(loadError,true);
+  }
+}
+async function fetchLogs(){
+  loadError='';
+  if(!authorized||!client)return;
+  const requestVersion=routeVersion;
+  try{
+    const {data,error}=await client.from('system_logs').select('*').order('created_at',{ascending:false});
+    if(!authorized||requestVersion!==routeVersion)return;
+    if(error)throw error;
+    logs=data||[];
+  }catch(e){
+    logs=[];
+    loadError='Não foi possível carregar os logs.';
+    toast(loadError,true);
+  }
+}
+async function loadLovableData(){
+  const apiKey=loadedSettings?.lovable_api_key;
+  if(!apiKey){lovableBalance=null;lovableLicences=[];return;}
+  try{
+    const [resBal,resLic]=await Promise.all([
+      fetch('https://rest.lovableup.online/api/v1/balance',{headers:{'x-api-key':apiKey}}),
+      fetch('https://rest.lovableup.online/api/v1/all-licences',{headers:{'x-api-key':apiKey}})
+    ]);
+    if(resBal.ok)lovableBalance=(await resBal.json()).balance;
+    if(resLic.ok)lovableLicences=(await resLic.json()).licences;
+  }catch(e){
+    console.warn('Erro Lovable',e);
+    toast('Erro ao contatar API Lovable.',true);
+  }
+}
 let routeVersion=0;
-async function navigate(next){if(!routes[next]||!authorized)return;tab=next;page=1;selection.clear();const version=++routeVersion;$('adminPageTitle').textContent=routes[tab];$('breadcrumb').textContent=routes[tab];$('pageContext').textContent=descriptions[tab];document.querySelectorAll('[data-route]').forEach(b=>{b.classList.toggle('active',b.dataset.route===tab);b.setAttribute('aria-current',b.dataset.route===tab?'page':'false')});closeSidebar();$('adminContent').innerHTML='<div class="skeleton-row"><div></div><div></div><div></div></div><div class="skeleton-chart"></div>';if(['dashboard','users','payments','subscriptions'].includes(tab))await fetchOrders();if(tab==='coupons')await fetchCoupons();if(tab==='logs')await fetchLogs();if(tab==='licences')await loadLovableData();if(version!==routeVersion)return;render()}
+async function navigate(next){
+  if(!routes[next]||!authorized)return;
+  tab=next;
+  page=1;
+  selection.clear();
+  const version=++routeVersion;
+  $('adminPageTitle').textContent=routes[tab];
+  $('breadcrumb').textContent=routes[tab];
+  $('pageContext').textContent=descriptions[tab];
+  document.querySelectorAll('[data-route]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.route===tab);
+    b.setAttribute('aria-current',b.dataset.route===tab?'page':'false');
+  });
+  closeSidebar();
+  $('adminContent').innerHTML='<div class="skeleton-row"><div></div><div></div><div></div></div><div class="skeleton-chart"></div>';
+  if(['dashboard','users','payments','subscriptions','deliveries'].includes(tab))await fetchOrders();
+  if(tab==='coupons')await fetchCoupons();
+  if(tab==='logs')await fetchLogs();
+  if(tab==='licences')await loadLovableData();
+  if(version!==routeVersion)return;
+  render();
+}
 function filterValue(key){return filters[tab]?.[key]||''}
-function filterField(key,value){filters[tab]={...filters[tab],[key]:value};try{sessionStorage.setItem('lu-admin-filters',JSON.stringify(filters))}catch{}page=1;render();const input=document.querySelector(`[data-filter="${key}"]`);if(input?.type==='search'){input.focus();input.setSelectionRange(value.length,value.length)}}
-function toolbar(options=''){return `<div class="data-toolbar"><label class="table-search">${icon('search')}<input type="search" data-filter="search" aria-label="Buscar registros" placeholder="Buscar por nome, e-mail ou protocolo" value="${esc(filterValue('search'))}"></label>${options}</div>`}
-function statusFilter(){return `<select data-filter="status" aria-label="Filtrar por status">${[['','Todos os status'],['approved','Ativo'],['pending','Pendente'],['rejected','Rejeitado']].map(([v,l])=>`<option value="${v}" ${filterValue('status')===v?'selected':''}>${l}</option>`).join('')}</select>`}
-function filteredOrders(){const q=filterValue('search').toLowerCase();return orders.filter(o=>(!filterValue('status')||o.status===filterValue('status'))&&[o.name,o.email,o.protocol].join(' ').toLowerCase().includes(q))}
-function metrics(){const approved=orders.filter(o=>o.status==='approved');return [['payments','Receita confirmada',loadError?'—':money(approved.reduce((s,o)=>s+Number(o.amount||0),0)),'Somente pagamentos aprovados'],['users','Clientes únicos',loadError?'—':new Set(orders.map(o=>o.email)).size,'Identificados pelos pedidos'],['subscriptions','Pagamentos pendentes',loadError?'—':orders.filter(o=>o.status==='pending').length,'Aguardando confirmação'],['extension','Downloads registrados',loadError?'—':orders.reduce((s,o)=>s+Number(o.download_count||0),0),'Total informado nos pedidos']]}
-function chart(title,kind){const points=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);const key=d.toISOString().slice(0,10);let list=orders.filter(o=>o.created_at?.slice(0,10)===key);return {label:d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),value:kind==='revenue'?list.filter(o=>o.status==='approved').reduce((s,o)=>s+Number(o.amount||0),0):new Set(list.map(o=>o.email)).size}});const max=Math.max(1,...points.map(p=>p.value));return `<article class="chart-card"><div class="panel-title"><h2>${title}</h2><span>Últimos 7 dias</span></div>${loadError?empty('Dados indisponíveis','Atualize para tentar novamente.'):`<div class="bar-chart" role="img" aria-label="${esc(title+': '+points.map(p=>p.label+' '+p.value).join('; '))}">${points.map(p=>`<div class="bar-column"><span>${kind==='revenue'?money(p.value):p.value}</span><div class="bar-track"><i style="height:${Math.max(1,p.value/max*100)}%"></i></div><small>${p.label}</small></div>`).join('')}</div>`}<p class="chart-note">${kind==='revenue'?'Pedidos aprovados, agrupados pela data do pedido.':'Clientes com pedidos em cada dia; não representa cadastros de contas.'}</p></article>`}
-function paymentBadge(status){return status==='approved'?'<span class="badge ok">Aprovado</span>':badge(status)}
-function paymentRows(list,actions=true){return list.map(o=>`<tr><td><b>${esc(o.name)}</b><small>${esc(o.email)}</small></td><td class="mono">${esc(o.protocol)}</td><td>${money(o.amount)}</td><td>${paymentBadge(o.status)}</td><td>${date(o.created_at)}</td>${actions?`<td><button class="row-action" data-order="${esc(o.id)}" aria-label="Detalhes do pedido de ${esc(o.name)}">Ver detalhes ↗</button></td>`:''}</tr>`).join('')}
-function paymentsTable(list,actions=true){return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Protocolo</th><th>Valor</th><th>Status</th><th>Data do pedido</th>${actions?'<th>Ações</th>':''}</tr></thead><tbody>${paymentRows(list,actions)||`<tr><td colspan="6">${empty('Nenhum pagamento encontrado','Novos pedidos aparecerão aqui. Tente outros filtros.')}</td></tr>`}</tbody></table></div>`}
-function pagination(count){const pages=Math.max(1,Math.ceil(count/8));page=Math.min(page,pages);return `<div class="pagination"><span>${count} registros · Página ${page} de ${pages}</span><div><button class="btn-outline" data-page="-1" ${page===1?'disabled':''}>Anterior</button><button class="btn-outline" data-page="1" ${page===pages?'disabled':''}>Próxima</button></div></div>`}
-function dashboard(){return `<div class="stat-grid">${metrics().map(([i,l,v,n])=>`<article class="stat-card"><div class="stat-top">${icon(i)}<span>${l}</span></div><strong>${v}</strong><p>${n}</p></article>`).join('')}</div><div class="charts-grid">${chart('Receita ao longo do tempo','revenue')}${chart('Clientes com pedidos','users')}</div><div class="insight-row"><article><h3>Assinaturas recorrentes</h3><p>O produto atual oferece acesso vitalício. Não há próximas cobranças ou cancelamentos recorrentes para acompanhar.</p><button class="text-button" data-go="subscriptions">Ver acessos →</button></article></div><section class="table-section"><div class="panel-title"><h2>Pagamentos recentes</h2><button class="text-button" data-go="payments">Ver todos →</button></div>${paymentsTable(orders.slice(0,5))}</section>`}
-function users(){const map=new Map();orders.forEach(o=>{const prior=map.get(o.email);if(!prior)map.set(o.email,{...o,first:o.created_at,count:1,total:o.status==='approved'?Number(o.amount):0});else{prior.count++;prior.total+=o.status==='approved'?Number(o.amount):0;if(o.created_at<prior.first)prior.first=o.created_at;if(o.status==='approved')prior.status='approved'}});let list=[...map.values()].filter(o=>[o.name,o.email].join(' ').toLowerCase().includes(filterValue('search').toLowerCase())&&(!filterValue('status')||o.status===filterValue('status')));list.sort((a,b)=>filterValue('sort')==='name'?a.name.localeCompare(b.name):String(b.first).localeCompare(String(a.first)));const pager=pagination(list.length);return `<p class="data-explainer">Clientes derivados dos pedidos. Cadastro de conta e último acesso não estão disponíveis nesta integração.</p>${toolbar(statusFilter()+`<select data-filter="sort" aria-label="Ordenar usuários"><option value="">Mais recentes</option><option value="name" ${filterValue('sort')==='name'?'selected':''}>Nome A–Z</option></select>`)}<div class="selection-bar"><span id="selectionCount">${selection.size} selecionados</span><button class="text-button" id="exportSelected">Exportar selecionados</button></div><div class="table-wrap"><table class="data-table users-table"><thead><tr><th><input type="checkbox" id="selectAll" aria-label="Selecionar esta página"></th><th>Usuário</th><th>Plano</th><th>Status</th><th>Primeiro pedido</th><th>Último acesso</th><th>Ações</th></tr></thead><tbody>${list.slice((page-1)*8,page*8).map(o=>`<tr><td><input type="checkbox" data-select="${esc(o.email)}" ${selection.has(o.email)?'checked':''} aria-label="Selecionar ${esc(o.name)}"></td><td><button class="user-cell" data-user="${esc(o.email)}"><span class="avatar">${esc(o.name?.slice(0,2).toUpperCase())}</span><span><b>${esc(o.name)}</b><small>${esc(o.email)}</small></span></button></td><td>${o.status==='approved'?'Vitalício':'Não ativado'}</td><td>${badge(o.status)}</td><td>${date(o.first)}</td><td>Não disponível</td><td><button class="row-action" data-user="${esc(o.email)}" aria-label="Detalhes de ${esc(o.name)}">Detalhes ↗</button></td></tr>`).join('')||`<tr><td colspan="7">${empty('Nenhum usuário encontrado','Altere os filtros ou aguarde novos pedidos.')}</td></tr>`}</tbody></table></div>${pager}`}
-function subscriptions(){const list=filteredOrders();return `<div class="plan-banner"><div><h2>Um pagamento. Acesso vitalício.</h2><p>O plano atual não possui renovação automática. O acesso é liberado após a aprovação do pagamento PIX.</p></div><strong>R$ 97<small>pagamento único</small></strong></div>${toolbar(statusFilter())}<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Plano / valor</th><th>Status</th><th>Próxima cobrança</th><th>Método</th><th>Histórico</th></tr></thead><tbody>${list.map(o=>`<tr><td>${esc(o.name)}<small>${esc(o.email)}</small></td><td>Vitalício · ${money(o.amount)}</td><td>${badge(o.status)}</td><td>Não se aplica</td><td>PIX</td><td><button class="row-action" data-order="${esc(o.id)}">Ver pedido ↗</button></td></tr>`).join('')||'<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>'}</tbody></table></div>`}
-function couponsPage(){const list=coupons.filter(c=>c.code.toLowerCase().includes(filterValue('search').toLowerCase()));return `<div class="split-toolbar">${toolbar()}<button class="btn-primary" id="createCoupon">Criar cupom</button></div><div class="coupon-grid">${list.map((c)=>`<article class="coupon-card"><div class="panel-title"><h2>${esc(c.code)}</h2>${badge(c.active?'approved':'cancelled')}</div><strong>${c.discount}<small>% OFF</small></strong><p>${c.uses} de ${c.limit} utilizações</p><progress value="${c.uses}" max="${c.limit}" aria-label="Utilizações do cupom"></progress><div class="coupon-bottom"><span>Até ${date(c.expires+'T12:00:00')}</span><button class="text-button" data-coupon="${esc(c.code)}">${c.active?'Desativar':'Ativar'}</button></div></article>`).join('')||empty('Nenhum cupom encontrado','Crie um cupom ou altere a busca.')}</div>`}
-function licencesPage(){if(!loadedSettings?.lovable_api_key)return empty('API não configurada','Adicione sua Lovable API Key em Configurações > Integrações.');const balanceStr=lovableBalance!==null?money(lovableBalance/100):'—';let html=`<div class="split-toolbar"><div class="stat-top" style="align-items:center; gap:0.5rem"><strong>Saldo Restante:</strong><span style="font-size:1.1rem; color:var(--primary); font-weight:600">${balanceStr}</span><button class="icon-button" id="btnRefreshBalance" style="padding:4px; font-size:14px; border-radius:4px; border:1px solid var(--border-color); cursor:pointer; background:transparent" title="Atualizar saldo">🔄</button></div><div style="display:flex; gap:0.5rem"><select id="createLicenceType" class="form-input" style="width:140px; padding:0 0.5rem"><option value="lifetime">Vitalício</option><option value="basic_30d">Basic 30 dias</option></select><button class="btn-primary" id="btnCreateLicence">Gerar Licença</button></div></div>`;html+=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Chave (Token)</th><th>Tipo</th><th>Status</th><th>Criada em</th><th>Ação</th></tr></thead><tbody>`;lovableLicences.forEach(l=>{const isAvail=l.status==='disponivel';html+=`<tr><td class="mono">${esc(l.chave_token)}</td><td>${esc(l.type)}</td><td>${badge(isAvail?'approved':(l.status==='revogada'?'rejected':'pending'))}</td><td>${date(l.created_at)}</td><td>${isAvail?`<button class="row-action" data-revoke="${esc(l.chave_token)}">Revogar</button>`:'—'}</td></tr>`});if(!lovableLicences.length)html+=`<tr><td colspan="5">${empty('Nenhuma licença','Clique em Gerar Licença.')}</td></tr>`;html+=`</tbody></table></div>`;return html}
-function logsPage(){let list=logs.filter(l=>[l.user_email,l.description].join(' ').toLowerCase().includes(filterValue('search').toLowerCase())&&(!filterValue('type')||l.event_type===filterValue('type'))&&(!filterValue('status')||l.status===filterValue('status'))&&(!filterValue('date')||l.created_at.startsWith(filterValue('date'))));return toolbar(`<input type="date" data-filter="date" aria-label="Filtrar data" value="${esc(filterValue('date'))}"><select data-filter="type" aria-label="Tipo de evento">${['','Pagamento','Acesso'].map(v=>`<option ${filterValue('type')===v?'selected':''} value="${v}">${v||'Todos os eventos'}</option>`).join('')}</select><select data-filter="status" aria-label="Status do evento">${['','Sucesso','Falhou'].map(v=>`<option ${filterValue('status')===v?'selected':''} value="${v}">${v||'Todos os status'}</option>`).join('')}</select>`)+`<div class="table-wrap"><table class="data-table"><thead><tr><th>Data</th><th>Usuário</th><th>Evento</th><th>Descrição</th><th>Status</th></tr></thead><tbody>${list.map(l=>`<tr><td>${date(l.created_at)}</td><td>${esc(l.user_email)}</td><td>${l.event_type}</td><td>${l.description}</td><td>${badge(l.status==='Sucesso'?'approved':'failed')}</td></tr>`).join('')||'<tr><td colspan="5">Nenhum evento corresponde aos filtros.</td></tr>'}</tbody></table></div>`}
+function filterField(key,value){
+  filters[tab]={...filters[tab],[key]:value};
+  try{sessionStorage.setItem('lu-admin-filters',JSON.stringify(filters))}catch{}
+  page=1;
+  render();
+  const input=document.querySelector(`[data-filter="${key}"]`);
+  if(input?.type==='search'){input.focus();input.setSelectionRange(value.length,value.length)}
+}
+function toolbar(options=''){
+  return `<div class="data-toolbar"><label class="table-search">${icon('search')}<input type="search" data-filter="search" aria-label="Buscar registros" placeholder="Buscar por nome, e-mail ou protocolo" value="${esc(filterValue('search'))}"></label>${options}</div>`;
+}
+function statusFilter(){
+  return `<select data-filter="status" aria-label="Filtrar por status">${[['','Todos os status'],['approved','Confirmado'],['pending','Pendente'],['rejected','Rejeitado']].map(([v,l])=>`<option value="${v}" ${filterValue('status')===v?'selected':''}>${l}</option>`).join('')}</select>`;
+}
+function filteredOrders(){
+  const q=filterValue('search').toLowerCase();
+  return orders.filter(o=>(!filterValue('status')||o.status===filterValue('status')||(filterValue('status')==='approved'&&(o.status==='payment_confirmed'||o.payment_status==='confirmed'))||(filterValue('status')==='pending'&&o.payment_status==='pending'))&&[o.name,o.email,o.protocol].join(' ').toLowerCase().includes(q));
+}
+function metrics(){
+  const approved=orders.filter(o=>o.status==='approved'||o.status==='payment_confirmed'||o.payment_status==='confirmed');
+  const awaitingDeliv=orders.filter(o=>(o.status==='approved'||o.status==='payment_confirmed'||o.payment_status==='confirmed')&&o.delivery_status!=='delivered'&&!o.license_key);
+  return [
+    ['payments','Receita confirmada',loadError?'—':money(approved.reduce((s,o)=>s+Number(o.amount||0),0)),'Somente pagamentos confirmados'],
+    ['users','Clientes únicos',loadError?'—':new Set(orders.map(o=>o.email)).size,'Identificados pelos pedidos'],
+    ['deliveries','Aguardando entrega',loadError?'—':awaitingDeliv.length,'Pagamento ok · Pendente de envio'],
+    ['extension','Downloads registrados',loadError?'—':orders.reduce((s,o)=>s+Number(o.download_count||0),0),'Total informado nos pedidos']
+  ];
+}
+function chart(title,kind){
+  const points=Array.from({length:7},(_,i)=>{
+    const d=new Date();
+    d.setDate(d.getDate()-6+i);
+    const key=d.toISOString().slice(0,10);
+    let list=orders.filter(o=>o.created_at?.slice(0,10)===key);
+    return {label:d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),value:kind==='revenue'?list.filter(o=>o.status==='approved'||o.status==='payment_confirmed'||o.payment_status==='confirmed').reduce((s,o)=>s+Number(o.amount||0),0):new Set(list.map(o=>o.email)).size};
+  });
+  const max=Math.max(1,...points.map(p=>p.value));
+  return `<article class="chart-card"><div class="panel-title"><h2>${title}</h2><span>Últimos 7 dias</span></div>${loadError?empty('Dados indisponíveis','Atualize para tentar novamente.'):`<div class="bar-chart" role="img" aria-label="${esc(title+': '+points.map(p=>p.label+' '+p.value).join('; '))}">${points.map(p=>`<div class="bar-column"><span>${kind==='revenue'?money(p.value):p.value}</span><div class="bar-track"><i style="height:${Math.max(1,p.value/max*100)}%"></i></div><small>${p.label}</small></div>`).join('')}</div>`}<p class="chart-note">${kind==='revenue'?'Pedidos com pagamento confirmado, agrupados pela data do pedido.':'Clientes com pedidos em cada dia; não representa cadastros de contas.'}</p></article>`;
+}
+function paymentRows(list,actions=true){
+  return list.map(o=>`
+    <tr>
+      <td><b>${esc(o.name)}</b><small>${esc(o.email)}</small></td>
+      <td class="mono">${esc(o.protocol)}</td>
+      <td>${money(o.amount)}</td>
+      <td>${paymentBadge(o.payment_status||o.status)}</td>
+      <td>${deliveryBadge(o.delivery_status, o)}</td>
+      <td>${date(o.created_at)}</td>
+      ${actions?`<td><button class="row-action" data-order="${esc(o.id)}" aria-label="Detalhes do pedido de ${esc(o.name)}">Ver detalhes ↗</button></td>`:''}
+    </tr>
+  `).join('');
+}
+function paymentsTable(list,actions=true){
+  return `<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Protocolo</th><th>Valor</th><th>Pagamento</th><th>Entrega</th><th>Data do pedido</th>${actions?'<th>Ações</th>':''}</tr></thead><tbody>${paymentRows(list,actions)||`<tr><td colspan="7">${empty('Nenhum pagamento encontrado','Novos pedidos aparecerão aqui. Tente outros filtros.')}</td></tr>`}</tbody></table></div>`;
+}
+function pagination(count){
+  const pages=Math.max(1,Math.ceil(count/8));
+  page=Math.min(page,pages);
+  return `<div class="pagination"><span>${count} registros · Página ${page} de ${pages}</span><div><button class="btn-outline" data-page="-1" ${page===1?'disabled':''}>Anterior</button><button class="btn-outline" data-page="1" ${page===pages?'disabled':''}>Próxima</button></div></div>`;
+}
+function dashboard(){
+  return `<div class="stat-grid">${metrics().map(([i,l,v,n])=>`<article class="stat-card"><div class="stat-top">${icon(i)}<span>${l}</span></div><strong>${v}</strong><p>${n}</p></article>`).join('')}</div><div class="charts-grid">${chart('Receita ao longo do tempo','revenue')}${chart('Clientes com pedidos','users')}</div><div class="insight-row"><article><h3>Assinaturas recorrentes</h3><p>O produto atual oferece acesso vitalício. Não há próximas cobranças ou cancelamentos recorrentes para acompanhar.</p><button class="text-button" data-go="subscriptions">Ver acessos →</button></article></div><section class="table-section"><div class="panel-title"><h2>Pagamentos recentes</h2><button class="text-button" data-go="payments">Ver todos →</button></div>${paymentsTable(orders.slice(0,5))}</section>`;
+}
+function users(){
+  const map=new Map();
+  orders.forEach(o=>{
+    const prior=map.get(o.email);
+    const isApproved = o.status==='approved' || o.status==='payment_confirmed' || o.payment_status==='confirmed';
+    if(!prior)map.set(o.email,{...o,first:o.created_at,count:1,total:isApproved?Number(o.amount):0});
+    else{
+      prior.count++;
+      prior.total+=isApproved?Number(o.amount):0;
+      if(o.created_at<prior.first)prior.first=o.created_at;
+      if(isApproved)prior.status='approved';
+    }
+  });
+  let list=[...map.values()].filter(o=>[o.name,o.email].join(' ').toLowerCase().includes(filterValue('search').toLowerCase())&&(!filterValue('status')||o.status===filterValue('status')));
+  list.sort((a,b)=>filterValue('sort')==='name'?a.name.localeCompare(b.name):String(b.first).localeCompare(String(a.first)));
+  const pager=pagination(list.length);
+  return `<p class="data-explainer">Clientes derivados dos pedidos. Cadastro de conta e último acesso não estão disponíveis nesta integração.</p>${toolbar(statusFilter()+`<select data-filter="sort" aria-label="Ordenar usuários"><option value="">Mais recentes</option><option value="name" ${filterValue('sort')==='name'?'selected':''}>Nome A–Z</option></select>`)}<div class="selection-bar"><span id="selectionCount">${selection.size} selecionados</span><button class="text-button" id="exportSelected">Exportar selecionados</button></div><div class="table-wrap"><table class="data-table users-table"><thead><tr><th><input type="checkbox" id="selectAll" aria-label="Selecionar esta página"></th><th>Usuário</th><th>Plano</th><th>Status</th><th>Primeiro pedido</th><th>Último acesso</th><th>Ações</th></tr></thead><tbody>${list.slice((page-1)*8,page*8).map(o=>`<tr><td><input type="checkbox" data-select="${esc(o.email)}" ${selection.has(o.email)?'checked':''} aria-label="Selecionar ${esc(o.name)}"></td><td><button class="user-cell" data-user="${esc(o.email)}"><span class="avatar">${esc(o.name?.slice(0,2).toUpperCase())}</span><span><b>${esc(o.name)}</b><small>${esc(o.email)}</small></span></button></td><td>${(o.status==='approved'||o.status==='payment_confirmed'||o.payment_status==='confirmed')?'Vitalício':'Não ativado'}</td><td>${badge(o.status)}</td><td>${date(o.first)}</td><td>Não disponível</td><td><button class="row-action" data-user="${esc(o.email)}" aria-label="Detalhes de ${esc(o.name)}">Detalhes ↗</button></td></tr>`).join('')||`<tr><td colspan="7">${empty('Nenhum usuário encontrado','Altere os filtros ou aguarde novos pedidos.')}</td></tr>`}</tbody></table></div>${pager}`;
+}
+function subscriptions(){
+  const list=filteredOrders();
+  return `<div class="plan-banner"><div><h2>Um pagamento. Acesso vitalício.</h2><p>O plano atual não possui renovação automática. O acesso é liberado após a confirmação do pagamento PIX e entrega.</p></div><strong>R$ 97<small>pagamento único</small></strong></div>${toolbar(statusFilter())}<div class="table-wrap"><table class="data-table"><thead><tr><th>Cliente</th><th>Plano / valor</th><th>Status</th><th>Próxima cobrança</th><th>Método</th><th>Histórico</th></tr></thead><tbody>${list.map(o=>`<tr><td>${esc(o.name)}<small>${esc(o.email)}</small></td><td>Vitalício · ${money(o.amount)}</td><td>${badge(o.status)}</td><td>Não se aplica</td><td>PIX</td><td><button class="row-action" data-order="${esc(o.id)}">Ver pedido ↗</button></td></tr>`).join('')||'<tr><td colspan="6">Nenhum acesso encontrado.</td></tr>'}</tbody></table></div>`;
+}
+function deliveriesPage(){
+  const tabFilter = filterValue('deliveryTab') || 'awaiting';
+  const q = filterValue('search').toLowerCase();
+
+  const confirmed = orders.filter(o => {
+    return o.payment_status === 'confirmed' || o.status === 'payment_confirmed' || o.status === 'approved';
+  });
+
+  const filtered = confirmed.filter(o => {
+    const isDelivered = o.delivery_status === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery');
+    if (tabFilter === 'awaiting' && isDelivered) return false;
+    if (tabFilter === 'delivered' && !isDelivered) return false;
+    return [o.name, o.email, o.protocol, o.id].join(' ').toLowerCase().includes(q);
+  });
+
+  const awaitingCount = confirmed.filter(o => o.delivery_status !== 'delivered' && !(o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery')).length;
+  const deliveredCount = confirmed.filter(o => o.delivery_status === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery')).length;
+
+  const pager = pagination(filtered.length);
+  const pageSlice = filtered.slice((page-1)*8, page*8);
+
+  return `
+    <div class="delivery-tabs" style="display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
+      <button class="tab-btn ${tabFilter==='awaiting'?'active':''}" data-delivtab="awaiting" style="padding:8px 16px; border-radius:8px; border:1px solid ${tabFilter==='awaiting'?'var(--primary)':'var(--border-color)'}; background:${tabFilter==='awaiting'?'var(--primary)':'transparent'}; color:${tabFilter==='awaiting'?'#fff':'var(--text-1)'}; font-weight:600; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:8px;">
+        ⏳ Aguardando entrega
+        <span style="background:${tabFilter==='awaiting'?'rgba(255,255,255,0.25)':'var(--bg-2)'}; padding:2px 7px; border-radius:10px; font-size:11px;">${awaitingCount}</span>
+      </button>
+      <button class="tab-btn ${tabFilter==='delivered'?'active':''}" data-delivtab="delivered" style="padding:8px 16px; border-radius:8px; border:1px solid ${tabFilter==='delivered'?'var(--primary)':'var(--border-color)'}; background:${tabFilter==='delivered'?'var(--primary)':'transparent'}; color:${tabFilter==='delivered'?'#fff':'var(--text-1)'}; font-weight:600; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:8px;">
+        ✅ Entregues
+        <span style="background:${tabFilter==='delivered'?'rgba(255,255,255,0.25)':'var(--bg-2)'}; padding:2px 7px; border-radius:10px; font-size:11px;">${deliveredCount}</span>
+      </button>
+      <button class="tab-btn ${tabFilter==='all'?'active':''}" data-delivtab="all" style="padding:8px 16px; border-radius:8px; border:1px solid ${tabFilter==='all'?'var(--primary)':'var(--border-color)'}; background:${tabFilter==='all'?'var(--primary)':'transparent'}; color:${tabFilter==='all'?'#fff':'var(--text-1)'}; font-weight:600; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:8px;">
+        📋 Todos (${confirmed.length})
+      </button>
+    </div>
+
+    ${toolbar()}
+
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Produto / Plano</th>
+            <th>Pedido</th>
+            <th>Confirmação do PIX</th>
+            <th>Status da Entrega</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pageSlice.map(o => {
+            const isDelivered = o.delivery_status === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery');
+            return `
+              <tr>
+                <td><b>${esc(o.name)}</b><small>${esc(o.email)}</small></td>
+                <td>Vitalício · ${money(o.amount)}</td>
+                <td class="mono">${esc(o.protocol)}</td>
+                <td>${date(o.approved_at || o.created_at)}</td>
+                <td>${deliveryBadge(o.delivery_status, o)}</td>
+                <td>
+                  ${isDelivered ? `
+                    <button class="row-action" data-view-delivery="${esc(o.id)}">Ver entrega ↗</button>
+                  ` : `
+                    <button class="btn-primary" data-deliver="${esc(o.id)}" style="font-size:12px; padding:6px 12px; gap:4px;">
+                      ⚡ Entregar
+                    </button>
+                  `}
+                </td>
+              </tr>
+            `;
+          }).join('') || `<tr><td colspan="6">${empty('Nenhuma entrega encontrada', tabFilter==='awaiting'?'Todos os pagamentos confirmados já foram entregues!':'Nenhum pedido atende aos filtros atuais.')}</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+
+    ${pager}
+  `;
+}
+function couponsPage(){
+  const list=coupons.filter(c=>c.code.toLowerCase().includes(filterValue('search').toLowerCase()));
+  return `<div class="split-toolbar">${toolbar()}<button class="btn-primary" id="createCoupon">Criar cupom</button></div><div class="coupon-grid">${list.map((c)=>`<article class="coupon-card"><div class="panel-title"><h2>${esc(c.code)}</h2>${badge(c.active?'approved':'cancelled')}</div><strong>${c.discount}<small>% OFF</small></strong><p>${c.uses} de ${c.limit} utilizações</p><progress value="${c.uses}" max="${c.limit}" aria-label="Utilizações do cupom"></progress><div class="coupon-bottom"><span>Até ${date(c.expires+'T12:00:00')}</span><button class="text-button" data-coupon="${esc(c.code)}">${c.active?'Desativar':'Ativar'}</button></div></article>`).join('')||empty('Nenhum cupom encontrado','Crie um cupom ou altere a busca.')}</div>`;
+}
+function licencesPage(){
+  if(!loadedSettings?.lovable_api_key)return empty('API não configurada','Adicione sua Lovable API Key em Configurações > Integrações.');
+  const balanceStr=lovableBalance!==null?money(lovableBalance/100):'—';
+  let html=`<div class="split-toolbar"><div class="stat-top" style="align-items:center; gap:0.5rem"><strong>Saldo Restante:</strong><span style="font-size:1.1rem; color:var(--primary); font-weight:600">${balanceStr}</span><button class="icon-button" id="btnRefreshBalance" style="padding:4px; font-size:14px; border-radius:4px; border:1px solid var(--border-color); cursor:pointer; background:transparent" title="Atualizar saldo">🔄</button></div><div style="display:flex; gap:0.5rem"><select id="createLicenceType" class="form-input" style="width:140px; padding:0 0.5rem"><option value="lifetime">Vitalício</option><option value="basic_30d">Basic 30 dias</option></select><button class="btn-primary" id="btnCreateLicence">Gerar Licença</button></div></div>`;
+  html+=`<div class="table-wrap"><table class="data-table"><thead><tr><th>Chave (Token)</th><th>Tipo</th><th>Status</th><th>Criada em</th><th>Ação</th></tr></thead><tbody>`;
+  lovableLicences.forEach(l=>{
+    const isAvail=l.status==='disponivel';
+    html+=`<tr><td class="mono">${esc(l.chave_token)}</td><td>${esc(l.type)}</td><td>${badge(isAvail?'approved':(l.status==='revogada'?'rejected':'pending'))}</td><td>${date(l.created_at)}</td><td>${isAvail?`<button class="row-action" data-revoke="${esc(l.chave_token)}">Revogar</button>`:'—'}</td></tr>`;
+  });
+  if(!lovableLicences.length)html+=`<tr><td colspan="5">${empty('Nenhuma licença','Clique em Gerar Licença.')}</td></tr>`;
+  html+=`</tbody></table></div>`;
+  return html;
+}
+function logsPage(){
+  let list=logs.filter(l=>[l.user_email,l.description].join(' ').toLowerCase().includes(filterValue('search').toLowerCase())&&(!filterValue('type')||l.event_type===filterValue('type'))&&(!filterValue('status')||l.status===filterValue('status'))&&(!filterValue('date')||l.created_at.startsWith(filterValue('date'))));
+  return toolbar(`<input type="date" data-filter="date" aria-label="Filtrar data" value="${esc(filterValue('date'))}"><select data-filter="type" aria-label="Tipo de evento">${['','Pagamento','Acesso'].map(v=>`<option ${filterValue('type')===v?'selected':''} value="${v}">${v||'Todos os eventos'}</option>`).join('')}</select><select data-filter="status" aria-label="Status do evento">${['','Sucesso','Falhou'].map(v=>`<option ${filterValue('status')===v?'selected':''} value="${v}">${v||'Todos os status'}</option>`).join('')}</select>`)+`<div class="table-wrap"><table class="data-table"><thead><tr><th>Data</th><th>Usuário</th><th>Evento</th><th>Descrição</th><th>Status</th></tr></thead><tbody>${list.map(l=>`<tr><td>${date(l.created_at)}</td><td>${esc(l.user_email)}</td><td>${l.event_type}</td><td>${l.description}</td><td>${badge(l.status==='Sucesso'?'approved':'failed')}</td></tr>`).join('')||'<tr><td colspan="5">Nenhum evento corresponde aos filtros.</td></tr>'}</tbody></table></div>`;
+}
 function settingsPage() {
-  const categories = ['Geral', 'Branding', 'Pagamentos', 'Extensão', 'E-mails', 'Segurança', 'Integrações'];
+  const categories = ['Geral', 'Branding', 'Página de entrega', 'Pagamentos', 'Extensão', 'E-mails', 'Segurança', 'Integrações'];
   const help = {
     'E-mails': 'Nenhum serviço de e-mail transacional está conectado neste projeto.',
     'Segurança': 'O acesso exige uma sessão autenticada. A proteção dos registros deve ser garantida pelas políticas RLS do Supabase.',
@@ -57,6 +398,42 @@ function settingsPage() {
     formContent = `<p>Informações usadas na página e na entrega do produto.</p><form id="settingsForm"><label>Título da página<input name="site_title" required maxlength="150" value="${esc(loadedSettings?.site_title||'LovableUnlimited — Crie mais. Interrompa menos.')}"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button>${!loadedSettings?'<p>Carregando configurações. A edição será liberada após a leitura.</p>':''}</form><hr class="t-divider" style="margin:2rem 0"><div style="text-align:center"><button type="button" class="btn-outline" style="border-color:var(--error); color:var(--error); width:100%" id="btnResetSettings">⚠️ Redefinir Tudo ao Padrão</button><p style="font-size:0.8rem; color:var(--text-3); margin-top:0.5rem;">Cuidado: Isso apagará suas cores, chave PIX e título personalizados.</p></div>`;
   } else if (settingCategory === 'Branding') {
     formContent = `<p>Identidade visual do site.</p><form id="settingsForm"><label>Cor Primária<input type="color" name="primary_color" value="${esc(loadedSettings?.primary_color||'#7b3aed')}" style="height:46px;padding:4px;cursor:pointer;"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button></form>`;
+  } else if (settingCategory === 'Página de entrega') {
+    formContent = `
+      <p>Personalize visualmente a página que o cliente vê durante a confirmação e a entrega do pedido.</p>
+      
+      <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(168, 85, 247, 0.04) 100%); border: 1.5px solid #c4b5fd; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap;">
+          <div style="max-width:540px;">
+            <span class="badge purple" style="margin-bottom:10px;">✨ Editor Visual Personalizado</span>
+            <h3 style="font-size:18px; font-weight:700; color:#1e1b29; margin-bottom:8px;">Personalizador da Página de Entrega</h3>
+            <p style="font-size:13.5px; color:#554c69; line-height:1.6; margin-bottom:16px;">
+              Abra nosso editor visual com preview em tempo real (Desktop, Tablet e Mobile). Edite cores, fontes, títulos, textos de espera e ative/desative animações de confete e timeline sem quebrar o layout.
+            </p>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+              <a href="editor.html" target="_blank" class="btn-primary" style="text-decoration:none; padding:11px 20px; font-size:14px; gap:8px;">
+                🎨 Abrir Editor Visual
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+              <a href="obrigado.html?order=demo" target="_blank" class="btn-outline" style="text-decoration:none; padding:11px 16px; font-size:14px;">
+                👀 Ver Demonstração
+              </a>
+            </div>
+          </div>
+          <div style="background:#fff; border-radius:12px; padding:16px; border:1px solid #e4ddec; min-width:220px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+            <div style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; margin-bottom:8px;">Status da Configuração</div>
+            <div style="margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:8px;">
+              <span style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+              <b>Publicado:</b> ${loadedSettings?.delivery_page_config ? 'Personalizado' : 'Padrão do Sistema'}
+            </div>
+            <div style="font-size:13px; display:flex; align-items:center; gap:8px;">
+              <span style="width:8px; height:8px; border-radius:50%; background:${loadedSettings?.delivery_page_draft ? '#f59e0b' : '#94a3b8'};"></span>
+              <b>Rascunho:</b> ${loadedSettings?.delivery_page_draft ? 'Existe rascunho' : 'Nenhum'}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   } else if (settingCategory === 'Pagamentos') {
     formContent = `<p>Dados para o recebimento via PIX.</p><form id="settingsForm"><label>Preço do Produto (R$)<input type="number" step="0.01" min="0" name="product_price" required value="${esc(loadedSettings?.product_price||97)}"></label><label>Sua Chave PIX<input name="pix_key" required placeholder="Sua chave CPF, Email ou Celular" value="${esc(loadedSettings?.pix_key||'')}"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button></form>`;
   } else if (settingCategory === 'Extensão') {
@@ -70,7 +447,7 @@ function settingsPage() {
         </div>
         <h3 style="font-size: 16px; font-weight: 600; color: #1e1b29; margin-bottom: 6px;">Enviar Novo Arquivo da Extensão</h3>
         <p style="font-size: 13px; color: #6b627b; margin-bottom: 16px; max-width: 440px; margin-left: auto; margin-right: auto;">
-          Escolha o arquivo no seu computador (.zip, .crx, .rar, etc.). Ele será salvo no armazenamento e entregue automaticamente aos clientes aprovados.
+          Escolha o arquivo no seu computador (.zip, .crx, .rar, etc.). Ele será salvo no armazenamento e entregue aos clientes.
         </p>
         <input type="file" id="extFileInput" accept=".zip,.crx,.rar,.7z,.tar,.gz,.json" style="display: none;">
         <button type="button" class="btn-primary" id="btnSelectFile" style="gap: 8px;">
@@ -105,19 +482,802 @@ function settingsPage() {
 
   return `<div class="settings-layout"><nav class="settings-nav" aria-label="Categorias de configurações">${categories.map(c=>`<button data-category="${c}" class="${settingCategory===c?'active':''}">${c}</button>`).join('')}</nav><section class="settings-card"><h2>${settingCategory}</h2>${formContent}</section></div>`;
 }
-function render(){const renderers={dashboard,users,subscriptions,coupons:couponsPage,licences:licencesPage,logs:logsPage,settings:settingsPage,payments:()=>{const list=filteredOrders();const pager=pagination(list.length);return toolbar(statusFilter())+paymentsTable(list.slice((page-1)*8,page*8))+pager}};$('adminContent').innerHTML=(loadError&&['dashboard','users','payments','subscriptions'].includes(tab)?`<div class="error-banner" role="alert">${esc(loadError)}</div>`:'')+renderers[tab]();bindContent();if(tab==='settings'&&!loadedSettings)loadSettings()}
-async function loadSettings(){if(!authorized||!client)return;const requestVersion=routeVersion;try{const {data,error}=await client.from('settings').select('*').single();if(!authorized||requestVersion!==routeVersion)return;if(error)throw error;loadedSettings=data;if(tab==='settings')render()}catch{toast('Configurações indisponíveis. Tente atualizar antes de editar.',true)}}
-function userDetail(email){const list=orders.filter(o=>o.email===email);if(!list.length)return;modal(`<div class="detail-heading"><span class="avatar large">${esc(list[0].name.slice(0,2))}</span><h2>${esc(list[0].name)}</h2><p>${esc(email)}</p></div><dl class="detail-list"><div><dt>Plano</dt><dd>${list.some(o=>o.status==='approved')?'Vitalício':'Não ativado'}</dd></div><div><dt>Pedidos</dt><dd>${list.length}</dd></div><div><dt>Total confirmado</dt><dd>${money(list.filter(o=>o.status==='approved').reduce((s,o)=>s+Number(o.amount),0))}</dd></div><div><dt>Cadastro da conta</dt><dd>Não disponível</dd></div><div><dt>Último acesso</dt><dd>Não disponível</dd></div></dl><h3>Histórico de pedidos</h3>${list.map(o=>`<div class="history-row"><span>${esc(o.protocol)}<small>${date(o.created_at)}</small></span>${badge(o.status)}</div>`).join('')}`)}
-function orderDetail(id){const o=orders.find(o=>o.id===id);if(!o)return;modal(`<h2>Detalhes do pagamento</h2><p class="dialog-sub">${esc(o.protocol)}</p><dl class="detail-list"><div><dt>Cliente</dt><dd>${esc(o.name)}</dd></div><div><dt>E-mail</dt><dd>${esc(o.email)}</dd></div><div><dt>Licença</dt><dd class="mono">${o.license_key?esc(o.license_key):'—'}</dd></div><div><dt>Valor / método</dt><dd>${money(o.amount)} · PIX</dd></div><div><dt>Status</dt><dd>${badge(o.status)}</dd></div><div><dt>Pedido criado</dt><dd>${date(o.created_at)}</dd></div><div><dt>Aprovado em</dt><dd>${date(o.approved_at)}</dd></div></dl>${o.status==='pending'?'<div class="dialog-actions"><button class="btn-outline" id="rejectOrder">Rejeitar pedido</button><button class="btn-primary" id="approveOrder">Aprovar pagamento</button></div>':''}`);if(o.status==='pending'){$('rejectOrder').onclick=()=>confirmOrder(id,'rejected');$('approveOrder').onclick=()=>confirmOrder(id,'approved')}}
-function confirmOrder(id,status){$('detailDialog').close();modal(`<h2>${status==='approved'?'Confirmar pagamento?':'Rejeitar este pedido?'}</h2><p class="dialog-sub">${status==='approved'?'O cliente receberá uma licença (se configurado) e poderá baixar a extensão. Confirme somente após verificar o PIX.':'O pedido ficará rejeitado e não liberará o download nem a licença.'}</p><div class="dialog-actions"><button class="btn-outline" id="cancelAction">Cancelar</button><button class="btn-primary" id="confirmOrder">Confirmar ${status==='approved'?'aprovação':'rejeição'}</button></div>`);$('cancelAction').onclick=()=>$('detailDialog').close();$('confirmOrder').onclick=async()=>{const btn=$('confirmOrder');btn.disabled=true;try{if(!authorized||!client)throw new Error('Sessão administrativa necessária.');let updatePayload={status};if(status==='approved')updatePayload.approved_at=new Date().toISOString();if(status==='approved'&&loadedSettings?.lovable_api_key){const res=await fetch('https://rest.lovableup.online/api/v1/create-licence',{method:'POST',headers:{'x-api-key':loadedSettings.lovable_api_key,'Content-Type':'application/json'},body:JSON.stringify({type:'lifetime'})});const apiData=await res.json();if(!apiData.success){if(apiData.error&&apiData.error.toLowerCase().includes('saldo')||apiData.error?.toLowerCase().includes('balance')){throw new Error('Saldo mínimo necessário para gerar uma licença');}throw new Error(apiData.error||'Falha ao gerar licença');}updatePayload.license_key=apiData.chave_token;}const {data,error}=await client.from('orders').update(updatePayload).eq('id',id).select('id').single();if(error)throw error;if(!data||data.id!==id)throw new Error('A atualização não foi confirmada pelo servidor.');const o=orders.find(o=>o.id===id);if(!o||!authorized)return;Object.assign(o,updatePayload);$('detailDialog').close();toast('Pedido atualizado com sucesso.');render()}catch(e){toast('Não foi possível atualizar: '+e.message,true);btn.disabled=false}}}
-function createCoupon(){modal(`<h2>Novo cupom</h2><form id="couponForm"><label>Código<input name="code" required pattern="[A-Za-z0-9_-]{3,24}" maxlength="24" placeholder="EXEMPLO20"></label><div class="form-row"><label>Desconto (%)<input type="number" name="discount" min="1" max="100" required value="20"></label><label>Limite de usos<input type="number" name="limit" min="1" max="1000000" required value="100"></label></div><label>Validade<input type="date" name="expires" min="${new Date().toISOString().slice(0,10)}" required></label><button class="btn-primary" id="btnSaveCoupon">Criar cupom</button></form>`);$('couponForm').onsubmit=async e=>{e.preventDefault();const btn=$('btnSaveCoupon');btn.disabled=true;try{const f=new FormData(e.target),code=f.get('code').toUpperCase();if(coupons.some(c=>c.code===code))throw new Error('Já existe um cupom com esse código.');const {error}=await client.from('coupons').insert([{code,discount:Number(f.get('discount')),limit:Number(f.get('limit')),expires:f.get('expires'),uses:0,active:true}]);if(error)throw error;$('detailDialog').close();await fetchCoupons();render();toast('Cupom criado com sucesso.');}catch(err){toast('Não foi possível criar: '+err.message,true);btn.disabled=false}}}
-function openTicket(id){const t=tickets.find(t=>t.id===id);modal(`<h2>${esc(t.subject)}</h2>${moduleNotice()}<div class="form-row"><label>Status<select id="ticketStatus">${['Aberto','Em andamento','Resolvido'].map(s=>`<option ${s===t.status?'selected':''}>${s}</option>`).join('')}</select></label><label>Prioridade<select id="ticketPriority">${['Baixa','Normal','Alta'].map(s=>`<option ${s===t.priority?'selected':''}>${s}</option>`).join('')}</select></label></div><div class="conversation">${t.messages.map(m=>`<div class="message"><b>${esc(m.who)}</b><p>${esc(m.text)}</p></div>`).join('')}</div><form id="replyForm"><label>Resposta de demonstração<textarea name="reply" required rows="3" maxlength="2000" placeholder="Escreva sua resposta…"></textarea></label><button class="btn-primary">Adicionar resposta demo</button></form>`,true);$('ticketStatus').onchange=e=>{t.status=e.target.value;render();toast('Status atualizado na demonstração.')};$('ticketPriority').onchange=e=>{t.priority=e.target.value;render()};$('replyForm').onsubmit=e=>{e.preventDefault();const text=new FormData(e.target).get('reply').trim();if(!text)return;t.messages.push({who:'Administrador demo',text});$('detailDialog').close();openTicket(id);toast('Resposta adicionada à simulação. Nenhuma mensagem foi enviada.')}}
-function bindContent(){document.querySelectorAll('[data-filter]').forEach(el=>el.addEventListener(el.type==='search'?'input':'change',()=>filterField(el.dataset.filter,el.value)));document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>navigate(b.dataset.go));document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{page+=Number(b.dataset.page);render()});document.querySelectorAll('[data-order]').forEach(b=>b.onclick=()=>orderDetail(b.dataset.order));document.querySelectorAll('[data-user]').forEach(b=>b.onclick=()=>userDetail(b.dataset.user));document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{settingCategory=b.dataset.category;render()});document.querySelectorAll('[data-select]').forEach(b=>b.onchange=()=>{b.checked?selection.add(b.dataset.select):selection.delete(b.dataset.select);$('selectionCount').textContent=selection.size+' selecionados'});if($('selectAll'))$('selectAll').onchange=e=>document.querySelectorAll('[data-select]').forEach(b=>{b.checked=e.target.checked;b.onchange()});if($('exportSelected'))$('exportSelected').onclick=()=>{if(!selection.size){toast('Selecione pelo menos um usuário.');return}const safe=v=>'"'+String(v).replace(/^[=+@-]/,"'").replace(/"/g,'""')+'"';const rows=[['Nome','E-mail'],...[...selection].map(email=>[orders.find(o=>o.email===email)?.name,email])];const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(safe).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='usuarios.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Exportação preparada.')};if($('btnRefreshBalance'))$('btnRefreshBalance').onclick=async()=>{const btn=$('btnRefreshBalance');btn.style.opacity='0.5';await loadLovableData();render();toast('Saldo atualizado!');};if($('btnCreateLicence'))$('btnCreateLicence').onclick=async()=>{const type=$('createLicenceType').value;const apiKey=loadedSettings?.lovable_api_key;$('btnCreateLicence').disabled=true;try{const res=await fetch('https://rest.lovableup.online/api/v1/create-licence',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({type})});const data=await res.json();if(!data.success){if(data.error&&data.error.toLowerCase().includes('saldo')||data.error?.toLowerCase().includes('balance')){throw new Error('Saldo mínimo necessário para gerar uma licença');}throw new Error(data.error||'Erro na API');}toast('Licença gerada com sucesso!');await loadLovableData();render()}catch(e){toast(e.message,true);$('btnCreateLicence').disabled=false}};document.querySelectorAll('[data-revoke]').forEach(b=>b.onclick=async()=>{if(!confirm('Tem certeza que deseja revogar esta licença? O valor será estornado.'))return;const apiKey=loadedSettings?.lovable_api_key;try{const res=await fetch('https://rest.lovableup.online/api/v1/revoke-licence',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({chave_token:b.dataset.revoke})});const data=await res.json();if(!data.success)throw new Error('Erro na API');toast('Licença revogada!');await loadLovableData();render()}catch(e){toast(e.message,true)}});if($('createCoupon'))$('createCoupon').onclick=createCoupon;document.querySelectorAll('[data-coupon]').forEach(b=>b.onclick=()=>{const c=coupons.find(c=>c.code===b.dataset.coupon);modal(`<h2>${c.active?'Desativar':'Ativar'} ${esc(c.code)}?</h2><p class="dialog-sub">Você tem certeza que quer ${c.active?'desativar':'ativar'} este cupom?</p><button class="btn-primary" id="toggleCouponBtn">${c.active?'Desativar':'Ativar'} cupom</button>`);$('toggleCouponBtn').onclick=async()=>{try{$('toggleCouponBtn').disabled=true;const {error}=await client.from('coupons').update({active:!c.active}).eq('code',c.code);if(error)throw error;c.active=!c.active;$('detailDialog').close();render();toast(`Cupom ${c.active?'ativado':'desativado'} com sucesso.`);}catch(e){toast('Erro: '+e.message,true);$('toggleCouponBtn').disabled=false;}}});if($('btnResetSettings'))$('btnResetSettings').onclick=async()=>{if(!confirm('Tem certeza que deseja apagar todas as configurações personalizadas e voltar ao padrão?'))return;const btn=$('btnResetSettings');btn.disabled=true;const defaults={site_title:'LovableUnlimited — Crie mais. Interrompa menos.',download_url:'lovableunlimited.zip',primary_color:'#7b3aed',pix_key:'',product_price:97};try{if(!authorized||!client||!loadedSettings?.id)throw new Error('Sem conexão.');const {error}=await client.from('settings').update(defaults).eq('id',loadedSettings.id);if(error)throw error;loadedSettings={...loadedSettings,...defaults};toast('Tudo voltou ao padrão!');render();}catch(e){toast('Erro: '+e.message,true);btn.disabled=false;}};if($('btnSelectFile'))$('btnSelectFile').onclick=()=>$('extFileInput').click();if($('extFileInput'))$('extFileInput').onchange=async()=>{const file=$('extFileInput').files[0];if(!file)return;const feedback=$('uploadFeedback');feedback.style.display='block';feedback.style.color='#7c3aed';feedback.textContent=`Enviando "${file.name}" (${(file.size/(1024*1024)).toFixed(2)} MB)... Aguarde.`;const btnSelect=$('btnSelectFile');btnSelect.disabled=true;try{if(!authorized||!client)throw new Error('Sessão administrativa necessária.');try{const {data:buckets}=await client.storage.listBuckets();const hasDownloads=buckets&&buckets.some(b=>b.name==='downloads'||b.id==='downloads');if(!hasDownloads){await client.storage.createBucket('downloads',{public:true});}}catch(e){console.warn('Bucket check:',e);}const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const filePath=`releases/${Date.now()}_${safeName}`;const {data,error}=await client.storage.from('downloads').upload(filePath,file,{cacheControl:'3600',upsert:true});    if(error){
-      if(error.message&&(error.message.includes('row-level security')||error.message.includes('policy'))){
-        throw new Error('Falta a política de permissão no Supabase Storage. Execute o script SQL no Supabase para liberar o upload no bucket "downloads".');
+function render(){
+  const renderers={
+    dashboard,
+    users,
+    subscriptions,
+    deliveries: deliveriesPage,
+    coupons: couponsPage,
+    licences: licencesPage,
+    logs: logsPage,
+    settings: settingsPage,
+    payments: () => {
+      const list = filteredOrders();
+      const pager = pagination(list.length);
+      return toolbar(statusFilter()) + paymentsTable(list.slice((page-1)*8, page*8)) + pager;
+    }
+  };
+  $('adminContent').innerHTML=(loadError&&['dashboard','users','payments','subscriptions','deliveries'].includes(tab)?`<div class="error-banner" role="alert">${esc(loadError)}</div>`:'')+renderers[tab]();
+  bindContent();
+  if(tab==='settings'&&!loadedSettings)loadSettings();
+}
+async function loadSettings(){
+  if(!authorized||!client)return;
+  const requestVersion=routeVersion;
+  try{
+    const {data,error}=await client.from('settings').select('*').single();
+    if(!authorized||requestVersion!==routeVersion)return;
+    if(error)throw error;
+    loadedSettings=data;
+    if(tab==='settings')render();
+  }catch{
+    toast('Configurações indisponíveis. Tente atualizar antes de editar.',true);
+  }
+}
+function userDetail(email){
+  const list=orders.filter(o=>o.email===email);
+  if(!list.length)return;
+  const hasApproved = list.some(o=>o.status==='approved'||o.status==='payment_confirmed'||o.payment_status==='confirmed');
+  modal(`
+    <div class="detail-heading">
+      <span class="avatar large">${esc(list[0].name.slice(0,2))}</span>
+      <h2>${esc(list[0].name)}</h2>
+      <p>${esc(email)}</p>
+    </div>
+    <dl class="detail-list">
+      <div><dt>Plano</dt><dd>${hasApproved?'Vitalício':'Não ativado'}</dd></div>
+      <div><dt>Pedidos</dt><dd>${list.length}</dd></div>
+      <div><dt>Total confirmado</dt><dd>${money(list.filter(o=>o.status==='approved'||o.status==='payment_confirmed'||o.payment_status==='confirmed').reduce((s,o)=>s+Number(o.amount),0))}</dd></div>
+      <div><dt>Cadastro da conta</dt><dd>Não disponível</dd></div>
+      <div><dt>Último acesso</dt><dd>Não disponível</dd></div>
+    </dl>
+    <h3>Histórico de pedidos</h3>
+    ${list.map(o=>`<div class="history-row"><span>${esc(o.protocol)}<small>${date(o.created_at)}</small></span>${badge(o.status)}</div>`).join('')}
+  `);
+}
+
+function orderDetail(id){
+  const o=orders.find(o=>o.id===id);
+  if(!o)return;
+  const payStatus = o.payment_status || (o.status==='approved'?'payment_confirmed':o.status) || 'pending';
+  const delivStatus = o.delivery_status || (o.license_key ? 'delivered' : (payStatus==='payment_confirmed'||o.status==='approved' ? 'awaiting_delivery' : 'pending'));
+  
+  let auditLogs = [];
+  try {
+    if (typeof o.audit_log === 'string') auditLogs = JSON.parse(o.audit_log);
+    else if (Array.isArray(o.audit_log)) auditLogs = o.audit_log;
+  } catch(e){}
+
+  const isPayPending = payStatus === 'pending' || o.status === 'pending';
+  const isPayConfirmed = payStatus === 'payment_confirmed' || o.status === 'approved' || payStatus === 'confirmed';
+  const isDelivered = delivStatus === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery');
+
+  let actionsHtml = '';
+  if (isPayPending) {
+    actionsHtml = `
+      <div class="dialog-actions" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:10px; width:100%;">
+          <button class="btn-outline" id="rejectOrder" style="flex:1;">Rejeitar pedido</button>
+          <button class="btn-primary" id="approveOrder" style="flex:1.5;">✓ Confirmar pagamento</button>
+        </div>
+        <button type="button" class="text-button" id="approveNoBalanceOrder" style="font-size:12px; color:var(--text-3); text-align:center; padding:6px; cursor:pointer;">
+          ⚙️ Confirmar sem saldo gratuito (Restrito ao Administrador)
+        </button>
+      </div>
+    `;
+  } else if (isPayConfirmed && !isDelivered) {
+    actionsHtml = `
+      <div class="dialog-actions" style="margin-top:20px; display:flex; gap:10px;">
+        <a href="obrigado.html?order=${encodeURIComponent(o.protocol)}" target="_blank" class="btn-outline" style="text-decoration:none; text-align:center; flex:1;">
+          Ver tela do cliente ↗
+        </a>
+        <button class="btn-primary" id="btnGoDeliver" style="flex:1.5; gap:8px;">
+          ⚡ Realizar Entrega de Saldo / Chave
+        </button>
+      </div>
+    `;
+  } else {
+    actionsHtml = `
+      <div class="dialog-actions" style="margin-top:20px; display:flex; gap:10px;">
+        <a href="obrigado.html?order=${encodeURIComponent(o.protocol)}" target="_blank" class="btn-outline" style="text-decoration:none; text-align:center; flex:1;">
+          Ver tela do cliente ↗
+        </a>
+        <button class="btn-primary" id="btnViewDeliverData" style="flex:1.5;">
+          Ver Detalhes da Entrega
+        </button>
+      </div>
+    `;
+  }
+
+  modal(`
+    <h2>Detalhes do pedido</h2>
+    <p class="dialog-sub">${esc(o.protocol)}</p>
+    <dl class="detail-list">
+      <div><dt>ID do Pedido</dt><dd class="mono" style="font-size:12px;">${esc(o.id)}</dd></div>
+      <div><dt>Cliente</dt><dd>${esc(o.name)}</dd></div>
+      <div><dt>E-mail</dt><dd>${esc(o.email)}</dd></div>
+      <div><dt>Produto / Plano</dt><dd>LovableUnlimited · Vitalício</dd></div>
+      <div><dt>Valor / Forma</dt><dd>${money(o.amount)} · PIX</dd></div>
+      <div><dt>Data do Pedido</dt><dd>${date(o.created_at)}</dd></div>
+      <div><dt>Status do Pagamento</dt><dd>${paymentBadge(payStatus)}</dd></div>
+      <div><dt>Status da Entrega</dt><dd>${deliveryBadge(delivStatus, o)}</dd></div>
+      <div><dt>Confirmado em</dt><dd>${o.approved_at ? date(o.approved_at) : '—'}</dd></div>
+      <div><dt>Entregue em</dt><dd>${o.delivered_at ? date(o.delivered_at) : '—'}</dd></div>
+      ${o.delivered_by ? `<div><dt>Entregue por</dt><dd>${esc(o.delivered_by)}</dd></div>` : ''}
+      ${o.license_key ? `<div><dt>Chave / Licença</dt><dd class="mono" style="color:var(--primary); font-weight:700;">${esc(o.license_key)}</dd></div>` : ''}
+    </dl>
+
+    ${auditLogs.length ? `
+      <div style="margin-top:20px; border-top:1px solid var(--border-color); padding-top:14px;">
+        <h3 style="font-size:13px; font-weight:700; color:var(--text-2); text-transform:uppercase; margin-bottom:10px;">Histórico & Auditoria</h3>
+        <div class="audit-timeline">
+          ${auditLogs.map(item => `
+            <div class="audit-item">
+              <span class="audit-time">${date(item.time)} ${new Date(item.time).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span>
+              <div class="audit-text"><b>${esc(item.action)}</b> por <small>${esc(item.by || 'Sistema')}</small></div>
+              ${item.note ? `<p style="font-size:12px; color:var(--text-3); margin-top:2px;">${esc(item.note)}</p>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    ${actionsHtml}
+  `);
+
+  if (isPayPending) {
+    $('rejectOrder').onclick = () => confirmOrder(id, 'rejected');
+    $('approveOrder').onclick = () => promptConfirmPayment(id, false);
+    $('approveNoBalanceOrder').onclick = () => promptConfirmPayment(id, true);
+  } else if (isPayConfirmed && !isDelivered) {
+    $('btnGoDeliver').onclick = () => {
+      $('detailDialog').close();
+      openDeliveryModal(id);
+    };
+  } else if ($('btnViewDeliverData')) {
+    $('btnViewDeliverData').onclick = () => {
+      $('detailDialog').close();
+      openDeliveryModal(id);
+    };
+  }
+}
+
+function promptConfirmPayment(id, noFreeBalance = false) {
+  $('detailDialog').close();
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+
+  modal(`
+    <h2>Confirmar pagamento?</h2>
+    <p class="dialog-sub" style="font-size:14px; margin-bottom:14px; line-height:1.5;">
+      ${noFreeBalance
+        ? '⚠️ <b>Atenção (Ação Restrita):</b> Você escolheu confirmar este pagamento <b>sem conceder saldo gratuito</b>. Este pedido será enviado para a fila de entrega.'
+        : 'Este pedido será enviado para a fila de entrega.'}
+    </p>
+
+    <div style="background:var(--bg-2); border-radius:10px; padding:14px 18px; margin-bottom:20px; font-size:13.5px; border:1px solid var(--border-color);">
+      <div style="margin-bottom:4px;"><b>Cliente:</b> ${esc(o.name)} (${esc(o.email)})</div>
+      <div style="margin-bottom:4px;"><b>Valor:</b> ${money(o.amount)} · PIX</div>
+      <div><b>Protocolo:</b> <code class="mono">${esc(o.protocol)}</code></div>
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn-outline" id="cancelConfirmPay">Cancelar</button>
+      <button class="btn-primary" id="btnExecuteConfirmPay">Confirmar pagamento</button>
+    </div>
+  `);
+
+  $('cancelConfirmPay').onclick = () => $('detailDialog').close();
+  $('btnExecuteConfirmPay').onclick = async () => {
+    const btn = $('btnExecuteConfirmPay');
+    btn.disabled = true;
+    btn.textContent = 'Confirmando…';
+    try {
+      if (!authorized || !client) throw new Error('Sessão administrativa necessária.');
+
+      const now = new Date().toISOString();
+      let currentAudit = [];
+      try {
+        if (typeof o.audit_log === 'string') currentAudit = JSON.parse(o.audit_log);
+        else if (Array.isArray(o.audit_log)) currentAudit = [...o.audit_log];
+      } catch(e){}
+
+      currentAudit.push({
+        action: noFreeBalance ? 'Pagamento confirmado (sem saldo gratuito)' : 'Pagamento confirmado',
+        by: userEmail || 'Administrador',
+        time: now,
+        note: noFreeBalance ? 'Confirmado sem concessão de saldo gratuito' : 'Enviado para fila de entrega'
+      });
+
+      const updatePayload = {
+        status: 'payment_confirmed',
+        payment_status: 'confirmed',
+        delivery_status: 'awaiting_delivery',
+        free_balance_granted: !noFreeBalance,
+        approved_at: now,
+        audit_log: JSON.stringify(currentAudit)
+      };
+
+      const { data, error } = await client.from('orders').update(updatePayload).eq('id', id).select('id').single();
+      if (error) {
+        console.warn('Fallback update for orders:', error);
+        const fbPayload = { status: 'approved', approved_at: now };
+        const { error: fbErr } = await client.from('orders').update(fbPayload).eq('id', id);
+        if (fbErr) throw fbErr;
+        updatePayload.status = 'approved';
       }
-      throw error;
-    }const {data:pubData}=client.storage.from('downloads').getPublicUrl(filePath);const publicUrl=pubData.publicUrl;let idToUpdate=loadedSettings?.id;if(!idToUpdate){const {data:sData}=await client.from('settings').select('id').single();if(sData)idToUpdate=sData.id;}if(idToUpdate){const {error:updErr}=await client.from('settings').update({download_url:publicUrl}).eq('id',idToUpdate);if(updErr)throw updErr;}loadedSettings={...loadedSettings,download_url:publicUrl};feedback.style.color='#059669';feedback.textContent=`✅ Arquivo "${file.name}" enviado com sucesso! Seus clientes já receberão este novo arquivo para download.`;toast('Novo arquivo salvo e configurado para entrega!');setTimeout(()=>render(),2000);}catch(err){feedback.style.color='#dc2626';feedback.textContent=`❌ ${err.message}`;toast('Não foi possível enviar: '+err.message,true);}finally{btnSelect.disabled=false;}};if($('settingsForm'))$('settingsForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const values=Object.fromEntries(f.entries());if(values.download_url){if(!/^(https:\/\/[^\s]+|[a-zA-Z0-9_.\/-]+)$/.test(values.download_url)||values.download_url.startsWith('//')){toast('Use um arquivo local ou URL HTTPS válido.',true);return}}const button=e.target.querySelector('button');button.disabled=true;try{if(!authorized||!client)throw new Error('Sem autorização.');let idToUpdate=loadedSettings?.id;if(!idToUpdate){const {data}=await client.from('settings').select('id').single();if(data)idToUpdate=data.id;else{const res=await client.from('settings').insert([values]).select('id').single();if(res.error)throw res.error;idToUpdate=res.data.id;}}if(idToUpdate){const {error}=await client.from('settings').update(values).eq('id',idToUpdate);if(error)throw error;}loadedSettings={...loadedSettings,...values};toast('Configurações salvas com sucesso!');render();}catch(err){toast('Não foi possível salvar: '+err.message,true);}finally{button.disabled=false;}}}
+
+      Object.assign(o, updatePayload);
+      $('detailDialog').close();
+      toast('Pagamento confirmado! O pedido entrou na fila de entrega.');
+      render();
+    } catch (e) {
+      toast('Erro ao confirmar: ' + e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Confirmar pagamento';
+    }
+  };
+}
+
+function openDeliveryModal(id) {
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+
+  const isDelivered = o.delivery_status === 'delivered' || (o.status === 'approved' && o.license_key && o.delivery_status !== 'awaiting_delivery');
+  let parsedPayload = {};
+  try {
+    if (typeof o.delivery_payload === 'string') parsedPayload = JSON.parse(o.delivery_payload);
+    else if (typeof o.delivery_payload === 'object') parsedPayload = o.delivery_payload || {};
+  } catch(e){}
+
+  modal(`
+    <h2>${isDelivered ? 'Dados da Entrega' : 'Realizar Entrega ao Cliente'}</h2>
+    <p class="dialog-sub">Pedido: <b>${esc(o.protocol)}</b> · Cliente: <b>${esc(o.name)}</b></p>
+
+    <div style="background:var(--bg-2); border-radius:12px; padding:14px 18px; margin-bottom:20px; font-size:13px; border:1px solid var(--border-color);">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="color:var(--text-3);">E-mail do cliente:</span>
+        <b>${esc(o.email)}</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="color:var(--text-3);">Valor pago:</span>
+        <b style="color:var(--ok);">${money(o.amount)} (PIX Confirmado)</b>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span style="color:var(--text-3);">Status da entrega:</span>
+        <span>${deliveryBadge(isDelivered ? 'delivered' : 'awaiting_delivery', o)}</span>
+      </div>
+    </div>
+
+    ${isDelivered ? `
+      <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:12px; padding:18px; margin-bottom:20px;">
+        <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:10px;">Conteúdo Entregue ao Cliente</div>
+        ${parsedPayload.balance ? `<p style="margin-bottom:8px;">💰 <b>Saldo Adicionado:</b> <span style="font-size:16px; font-weight:700; color:#7c3aed;">${esc(parsedPayload.balance)} créditos</span></p>` : ''}
+        ${o.license_key || parsedPayload.key ? `<p style="margin-bottom:8px;">🔑 <b>Chave de Ativação:</b> <code style="background:#fff; padding:4px 8px; border-radius:6px; font-weight:700; border:1px solid #c4b5fd;">${esc(o.license_key || parsedPayload.key)}</code></p>` : ''}
+        ${parsedPayload.message ? `<p style="margin-bottom:8px;">💬 <b>Instruções:</b> ${esc(parsedPayload.message)}</p>` : ''}
+        <div style="font-size:12px; color:var(--text-3); margin-top:12px; border-top:1px dashed #c4b5fd; padding-top:8px;">
+          Entregue em: <b>${date(o.delivered_at)}</b> por <b>${esc(o.delivered_by || 'Admin')}</b>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <a href="obrigado.html?order=${encodeURIComponent(o.protocol)}" target="_blank" class="btn-outline" style="text-decoration:none; text-align:center; flex:1;">
+          Ver tela do cliente ↗
+        </a>
+      </div>
+    ` : `
+      <form id="deliveryForm">
+        <div style="margin-bottom:16px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:6px;">Tipo de Entrega</label>
+          <div style="display:flex; gap:10px;">
+            <label style="flex:1; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:var(--bg-2); padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+              <input type="radio" name="delivType" value="key" checked> Chave Vitalícia
+            </label>
+            <label style="flex:1; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:var(--bg-2); padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+              <input type="radio" name="delivType" value="balance"> Saldo / Créditos
+            </label>
+            <label style="flex:1; display:flex; align-items:center; gap:6px; font-size:13px; cursor:pointer; background:var(--bg-2); padding:10px; border-radius:8px; border:1px solid var(--border-color);">
+              <input type="radio" name="delivType" value="custom"> Chave + Saldo
+            </label>
+          </div>
+        </div>
+
+        <div id="fieldKey" style="margin-bottom:14px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Chave de Ativação / Token:</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="inputDeliveryKey" placeholder="Ex: LVBL-VITALICIO-XXXX-XXXX" value="${esc(o.license_key || '')}" style="flex:1;">
+            <button type="button" class="btn-outline" id="btnGenRandomKey" style="font-size:12px; white-space:nowrap;">Gerar Chave</button>
+          </div>
+          <small style="color:var(--text-3); font-size:11px; margin-top:4px; display:block;">O cliente poderá copiar esta chave com um clique na tela de entrega.</small>
+        </div>
+
+        <div id="fieldBalance" style="margin-bottom:14px; display:none;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Quantidade de Saldo / Créditos:</label>
+          <input type="number" id="inputDeliveryBalance" min="0" placeholder="Ex: 500" value="500">
+          <small style="color:var(--text-3); font-size:11px; margin-top:4px; display:block;">Quantidade de créditos ou saldo que o cliente receberá.</small>
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <label style="font-weight:600; font-size:13px; display:block; margin-bottom:4px;">Informações / Instruções da Entrega (Opcional):</label>
+          <textarea id="inputDeliveryMsg" rows="3" placeholder="Ex: Sua licença vitalícia foi liberada com sucesso! Siga as instruções da extensão para ativar."></textarea>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" class="btn-outline" onclick="$('detailDialog').close()">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btnSubmitDelivery" style="flex:1.5; gap:8px;">
+            🚀 Entregar
+          </button>
+        </div>
+      </form>
+    `}
+  `, true);
+
+  if (!isDelivered) {
+    const radios = document.querySelectorAll('input[name="delivType"]');
+    const fKey = $('fieldKey');
+    const fBal = $('fieldBalance');
+    radios.forEach(r => r.onchange = () => {
+      if (r.value === 'key') {
+        fKey.style.display = 'block';
+        fBal.style.display = 'none';
+      } else if (r.value === 'balance') {
+        fKey.style.display = 'none';
+        fBal.style.display = 'block';
+      } else {
+        fKey.style.display = 'block';
+        fBal.style.display = 'block';
+      }
+    });
+
+    $('btnGenRandomKey').onclick = () => {
+      const part = () => Math.random().toString(36).substring(2, 6).toUpperCase();
+      $('inputDeliveryKey').value = `LVBL-${part()}-${part()}-${part()}`;
+    };
+
+    $('deliveryForm').onsubmit = (e) => {
+      e.preventDefault();
+      const type = document.querySelector('input[name="delivType"]:checked').value;
+      const key = $('inputDeliveryKey')?.value.trim() || '';
+      const balance = $('inputDeliveryBalance')?.value.trim() || '';
+      const msg = $('inputDeliveryMsg')?.value.trim() || '';
+
+      if (type === 'key' && !key) {
+        toast('Informe a chave de ativação para continuar.', true);
+        return;
+      }
+      if (type === 'balance' && !balance) {
+        toast('Informe a quantidade de saldo para continuar.', true);
+        return;
+      }
+
+      promptConfirmDelivery(id, { type, key, balance, msg });
+    };
+  }
+}
+
+function promptConfirmDelivery(id, { type, key, balance, msg }) {
+  $('detailDialog').close();
+  const o = orders.find(o => o.id === id);
+  if (!o) return;
+
+  modal(`
+    <h2>Confirmar entrega?</h2>
+    <p class="dialog-sub" style="font-size:14px; margin-bottom:16px;">
+      Após confirmar, o cliente poderá visualizar os dados entregues em tempo real.
+    </p>
+
+    <div style="background:var(--bg-2); border-radius:10px; padding:14px 18px; margin-bottom:20px; font-size:13px; border:1px solid var(--border-color);">
+      <div style="margin-bottom:4px;"><b>Cliente:</b> ${esc(o.name)} (${esc(o.email)})</div>
+      ${key ? `<div style="margin-bottom:4px;"><b>Chave de ativação:</b> <code style="font-weight:700;">${esc(key)}</code></div>` : ''}
+      ${balance ? `<div style="margin-bottom:4px;"><b>Saldo:</b> ${esc(balance)} créditos</div>` : ''}
+      ${msg ? `<div><b>Instruções:</b> ${esc(msg)}</div>` : ''}
+    </div>
+
+    <div class="dialog-actions">
+      <button class="btn-outline" id="cancelConfirmDelivery">Cancelar</button>
+      <button class="btn-primary" id="btnExecuteDelivery">Confirmar entrega</button>
+    </div>
+  `);
+
+  $('cancelConfirmDelivery').onclick = () => {
+    $('detailDialog').close();
+    openDeliveryModal(id);
+  };
+
+  $('btnExecuteDelivery').onclick = async () => {
+    const btn = $('btnExecuteDelivery');
+    btn.disabled = true;
+    btn.textContent = 'Entregando…';
+
+    try {
+      if (!authorized || !client) throw new Error('Sessão administrativa necessária.');
+
+      const now = new Date().toISOString();
+      let currentAudit = [];
+      try {
+        if (typeof o.audit_log === 'string') currentAudit = JSON.parse(o.audit_log);
+        else if (Array.isArray(o.audit_log)) currentAudit = [...o.audit_log];
+      } catch(e){}
+
+      let summaryText = [];
+      if (balance) summaryText.push(`Saldo adicionado: ${balance}`);
+      if (key) summaryText.push(`Chave gerada: ${key}`);
+      if (msg) summaryText.push('Instruções incluídas');
+
+      currentAudit.push({
+        action: 'Entrega concluída',
+        by: userEmail || 'Administrador',
+        time: now,
+        note: summaryText.join(' · ') || 'Entrega manual realizada'
+      });
+
+      const deliveryPayloadObj = {
+        type,
+        key: key || undefined,
+        balance: balance || undefined,
+        message: msg || undefined,
+        delivered_at: now,
+        delivered_by: userEmail || 'Administrador'
+      };
+
+      const updatePayload = {
+        delivery_status: 'delivered',
+        status: 'approved',
+        delivery_type: type,
+        delivery_payload: JSON.stringify(deliveryPayloadObj),
+        delivered_at: now,
+        delivered_by: userEmail || 'Administrador',
+        audit_log: JSON.stringify(currentAudit)
+      };
+
+      if (key) {
+        updatePayload.license_key = key;
+      }
+
+      const { data, error } = await client.from('orders').update(updatePayload).eq('id', id).select('id').single();
+      if (error) {
+        console.warn('Fallback update for orders:', error);
+        const fbPayload = { status: 'approved', license_key: key || o.license_key || 'LVBL-DELIVERED' };
+        const { error: fbErr } = await client.from('orders').update(fbPayload).eq('id', id);
+        if (fbErr) throw fbErr;
+        updatePayload.license_key = fbPayload.license_key;
+      }
+
+      Object.assign(o, updatePayload);
+      $('detailDialog').close();
+      toast('🎉 Entrega concluída com sucesso! O cliente já pode visualizar.');
+      render();
+    } catch (e) {
+      toast('Não foi possível entregar: ' + e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Confirmar entrega';
+    }
+  };
+}
+
+function confirmOrder(id,status){
+  $('detailDialog').close();
+  modal(`
+    <h2>Rejeitar este pedido?</h2>
+    <p class="dialog-sub">O pedido ficará rejeitado e não liberará o download nem a licença.</p>
+    <div class="dialog-actions">
+      <button class="btn-outline" id="cancelAction">Cancelar</button>
+      <button class="btn-primary" id="confirmOrder">Confirmar rejeição</button>
+    </div>
+  `);
+  $('cancelAction').onclick=()=>$('detailDialog').close();
+  $('confirmOrder').onclick=async()=>{
+    const btn=$('confirmOrder');
+    btn.disabled=true;
+    try{
+      if(!authorized||!client)throw new Error('Sessão administrativa necessária.');
+      let updatePayload={status};
+      const {data,error}=await client.from('orders').update(updatePayload).eq('id',id).select('id').single();
+      if(error)throw error;
+      const o=orders.find(o=>o.id===id);
+      if(o) Object.assign(o,updatePayload);
+      $('detailDialog').close();
+      toast('Pedido atualizado com sucesso.');
+      render();
+    }catch(e){
+      toast('Não foi possível atualizar: '+e.message,true);
+      btn.disabled=false;
+    }
+  };
+}
+
+function createCoupon(){
+  modal(`<h2>Novo cupom</h2><form id="couponForm"><label>Código<input name="code" required pattern="[A-Za-z0-9_-]{3,24}" maxlength="24" placeholder="EXEMPLO20"></label><div class="form-row"><label>Desconto (%)<input type="number" name="discount" min="1" max="100" required value="20"></label><label>Limite de usos<input type="number" name="limit" min="1" max="1000000" required value="100"></label></div><label>Validade<input type="date" name="expires" min="${new Date().toISOString().slice(0,10)}" required></label><button class="btn-primary" id="btnSaveCoupon">Criar cupom</button></form>`);
+  $('couponForm').onsubmit=async e=>{
+    e.preventDefault();
+    const btn=$('btnSaveCoupon');
+    btn.disabled=true;
+    try{
+      const f=new FormData(e.target),code=f.get('code').toUpperCase();
+      if(coupons.some(c=>c.code===code))throw new Error('Já existe um cupom com esse código.');
+      const {error}=await client.from('coupons').insert([{code,discount:Number(f.get('discount')),limit:Number(f.get('limit')),expires:f.get('expires'),uses:0,active:true}]);
+      if(error)throw error;
+      $('detailDialog').close();
+      await fetchCoupons();
+      render();
+      toast('Cupom criado com sucesso.');
+    }catch(err){
+      toast('Não foi possível criar: '+err.message,true);
+      btn.disabled=false;
+    }
+  };
+}
+
+function bindContent(){
+  document.querySelectorAll('[data-filter]').forEach(el=>el.addEventListener(el.type==='search'?'input':'change',()=>filterField(el.dataset.filter,el.value)));
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>navigate(b.dataset.go));
+  document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{page+=Number(b.dataset.page);render()});
+  document.querySelectorAll('[data-order]').forEach(b=>b.onclick=()=>orderDetail(b.dataset.order));
+  document.querySelectorAll('[data-user]').forEach(b=>b.onclick=()=>userDetail(b.dataset.user));
+  document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>{settingCategory=b.dataset.category;render()});
+  document.querySelectorAll('[data-delivtab]').forEach(b=>b.onclick=()=>{
+    if(!filters['deliveries']) filters['deliveries']={};
+    filters['deliveries'].deliveryTab=b.dataset.delivtab;
+    page=1;
+    render();
+  });
+  document.querySelectorAll('[data-deliver]').forEach(b=>b.onclick=()=>openDeliveryModal(b.dataset.deliver));
+  document.querySelectorAll('[data-view-delivery]').forEach(b=>b.onclick=()=>openDeliveryModal(b.dataset.viewDelivery));
+  document.querySelectorAll('[data-select]').forEach(b=>b.onchange=()=>{b.checked?selection.add(b.dataset.select):selection.delete(b.dataset.select);$('selectionCount').textContent=selection.size+' selecionados'});
+  if($('selectAll'))$('selectAll').onchange=e=>document.querySelectorAll('[data-select]').forEach(b=>{b.checked=e.target.checked;b.onchange()});
+  if($('exportSelected'))$('exportSelected').onclick=()=>{
+    if(!selection.size){toast('Selecione pelo menos um usuário.');return}
+    const safe=v=>'"'+String(v).replace(/^[=+@-]/,"'").replace(/"/g,'""')+'"';
+    const rows=[['Nome','E-mail'],...[...selection].map(email=>[orders.find(o=>o.email===email)?.name,email])];
+    const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(safe).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='usuarios.csv';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    toast('Exportação preparada.');
+  };
+  if($('btnRefreshBalance'))$('btnRefreshBalance').onclick=async()=>{
+    const btn=$('btnRefreshBalance');
+    btn.style.opacity='0.5';
+    await loadLovableData();
+    render();
+    toast('Saldo atualizado!');
+  };
+  if($('btnCreateLicence'))$('btnCreateLicence').onclick=async()=>{
+    const type=$('createLicenceType').value;
+    const apiKey=loadedSettings?.lovable_api_key;
+    $('btnCreateLicence').disabled=true;
+    try{
+      const res=await fetch('https://rest.lovableup.online/api/v1/create-licence',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({type})});
+      const data=await res.json();
+      if(!data.success){
+        if(data.error&&data.error.toLowerCase().includes('saldo')||data.error?.toLowerCase().includes('balance')){
+          throw new Error('Saldo mínimo necessário para gerar uma licença');
+        }
+        throw new Error(data.error||'Erro na API');
+      }
+      toast('Licença gerada com sucesso!');
+      await loadLovableData();
+      render();
+    }catch(e){
+      toast(e.message,true);
+      $('btnCreateLicence').disabled=false;
+    }
+  };
+  document.querySelectorAll('[data-revoke]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Tem certeza que deseja revogar esta licença? O valor será estornado.'))return;
+    const apiKey=loadedSettings?.lovable_api_key;
+    try{
+      const res=await fetch('https://rest.lovableup.online/api/v1/revoke-licence',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({chave_token:b.dataset.revoke})});
+      const data=await res.json();
+      if(!data.success)throw new Error('Erro na API');
+      toast('Licença revogada!');
+      await loadLovableData();
+      render();
+    }catch(e){
+      toast(e.message,true);
+    }
+  });
+  if($('createCoupon'))$('createCoupon').onclick=createCoupon;
+  document.querySelectorAll('[data-coupon]').forEach(b=>b.onclick=()=>{
+    const c=coupons.find(c=>c.code===b.dataset.coupon);
+    modal(`<h2>${c.active?'Desativar':'Ativar'} ${esc(c.code)}?</h2><p class="dialog-sub">Você tem certeza que quer ${c.active?'desativar':'ativar'} este cupom?</p><button class="btn-primary" id="toggleCouponBtn">${c.active?'Desativar':'Ativar'} cupom</button>`);
+    $('toggleCouponBtn').onclick=async()=>{
+      try{
+        $('toggleCouponBtn').disabled=true;
+        const {error}=await client.from('coupons').update({active:!c.active}).eq('code',c.code);
+        if(error)throw error;
+        c.active=!c.active;
+        $('detailDialog').close();
+        render();
+        toast(`Cupom ${c.active?'ativado':'desativado'} com sucesso.`);
+      }catch(e){
+        toast('Erro: '+e.message,true);
+        $('toggleCouponBtn').disabled=false;
+      }
+    };
+  });
+  if($('btnResetSettings'))$('btnResetSettings').onclick=async()=>{
+    if(!confirm('Tem certeza que deseja apagar todas as configurações personalizadas e voltar ao padrão?'))return;
+    const btn=$('btnResetSettings');
+    btn.disabled=true;
+    const defaults={site_title:'LovableUnlimited — Crie mais. Interrompa menos.',download_url:'lovableunlimited.zip',primary_color:'#7b3aed',pix_key:'',product_price:97};
+    try{
+      if(!authorized||!client||!loadedSettings?.id)throw new Error('Sem conexão.');
+      const {error}=await client.from('settings').update(defaults).eq('id',loadedSettings.id);
+      if(error)throw error;
+      loadedSettings={...loadedSettings,...defaults};
+      toast('Tudo voltou ao padrão!');
+      render();
+    }catch(e){
+      toast('Erro: '+e.message,true);
+      btn.disabled=false;
+    }
+  };
+  if($('btnSelectFile'))$('btnSelectFile').onclick=()=>$('extFileInput').click();
+  if($('extFileInput'))$('extFileInput').onchange=async()=>{
+    const file=$('extFileInput').files[0];
+    if(!file)return;
+    const feedback=$('uploadFeedback');
+    feedback.style.display='block';
+    feedback.style.color='#7c3aed';
+    feedback.textContent=`Enviando "${file.name}" (${(file.size/(1024*1024)).toFixed(2)} MB)... Aguarde.`;
+    const btnSelect=$('btnSelectFile');
+    btnSelect.disabled=true;
+    try{
+      if(!authorized||!client)throw new Error('Sessão administrativa necessária.');
+      try{
+        const {data:buckets}=await client.storage.listBuckets();
+        const hasDownloads=buckets&&buckets.some(b=>b.name==='downloads'||b.id==='downloads');
+        if(!hasDownloads){await client.storage.createBucket('downloads',{public:true});}
+      }catch(e){console.warn('Bucket check:',e);}
+      const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const filePath=`releases/${Date.now()}_${safeName}`;
+      const {data,error}=await client.storage.from('downloads').upload(filePath,file,{cacheControl:'3600',upsert:true});
+      if(error){
+        if(error.message&&(error.message.includes('row-level security')||error.message.includes('policy'))){
+          throw new Error('Falta a política de permissão no Supabase Storage. Crie o bucket "downloads" como público no Supabase.');
+        }
+        throw error;
+      }
+      const {data:pubData}=client.storage.from('downloads').getPublicUrl(filePath);
+      const publicUrl=pubData.publicUrl;
+      let idToUpdate=loadedSettings?.id;
+      if(!idToUpdate){
+        const {data:sData}=await client.from('settings').select('id').single();
+        if(sData)idToUpdate=sData.id;
+      }
+      if(idToUpdate){
+        const {error:updErr}=await client.from('settings').update({download_url:publicUrl}).eq('id',idToUpdate);
+        if(updErr)throw updErr;
+      }
+      loadedSettings={...loadedSettings,download_url:publicUrl};
+      feedback.style.color='#059669';
+      feedback.textContent=`✅ Arquivo "${file.name}" enviado com sucesso! Seus clientes já receberão este novo arquivo para download.`;
+      toast('Novo arquivo salvo e configurado para entrega!');
+      setTimeout(()=>render(),2000);
+    }catch(err){
+      feedback.style.color='#dc2626';
+      feedback.textContent=`❌ ${err.message}`;
+      toast('Não foi possível enviar: '+err.message,true);
+    }finally{
+      btnSelect.disabled=false;
+    }
+  };
+  if($('settingsForm'))$('settingsForm').onsubmit=async e=>{
+    e.preventDefault();
+    const f=new FormData(e.target);
+    const values=Object.fromEntries(f.entries());
+    if(values.download_url){
+      if(!/^(https:\/\/[^\s]+|[a-zA-Z0-9_.\/-]+)$/.test(values.download_url)||values.download_url.startsWith('//')){
+        toast('Use um arquivo local ou URL HTTPS válido.',true);
+        return;
+      }
+    }
+    const button=e.target.querySelector('button');
+    button.disabled=true;
+    try{
+      if(!authorized||!client)throw new Error('Sem autorização.');
+      let idToUpdate=loadedSettings?.id;
+      if(!idToUpdate){
+        const {data}=await client.from('settings').select('id').single();
+        if(data)idToUpdate=data.id;
+        else{
+          const res=await client.from('settings').insert([values]).select('id').single();
+          if(res.error)throw res.error;
+          idToUpdate=res.data.id;
+        }
+      }
+      if(idToUpdate){
+        const {error}=await client.from('settings').update(values).eq('id',idToUpdate);
+        if(error)throw error;
+      }
+      loadedSettings={...loadedSettings,...values};
+      toast('Configurações salvas com sucesso!');
+      render();
+    }catch(err){
+      toast('Não foi possível salvar: '+err.message,true);
+    }finally{
+      button.disabled=false;
+    }
+  };
+}
 function closeSidebar(){$('adminSidebar').classList.remove('open');$('sidebarBackdrop').hidden=true}
-$('adminNav').innerHTML=Object.entries(routes).map(([id,label])=>`<button class="menu-item" data-route="${id}" title="${label}">${icon(id)}<span>${label}</span></button>`).join('');document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>navigate(b.dataset.route));$('searchIcon').innerHTML=icon('search');$('notificationsButton').innerHTML=icon('bell');$('mobileToggle').innerHTML=icon('logs');$('loginForm').onsubmit=login;$('logoutButton').onclick=async()=>{try{if(client)await client.auth.signOut()}finally{authorized=false;orders=[];loadedSettings=null;selection.clear();routeVersion++;$('adminPanel').hidden=true;$('loginScreen').hidden=false;$('adminContent').innerHTML='';$('detailDialog').close()}};$('refreshButton').onclick=()=>{loadedSettings=null;navigate(tab)};$('mobileToggle').onclick=()=>{$('adminSidebar').classList.toggle('open');$('sidebarBackdrop').hidden=!$('adminSidebar').classList.contains('open')};$('sidebarBackdrop').onclick=closeSidebar;$('collapseSidebar').onclick=()=>$('adminPanel').classList.toggle('collapsed');$('notificationsButton').onclick=()=>modal('<h2>Notificações</h2>'+empty('Você está em dia','Não há um serviço de notificações conectado neste projeto.'));$('profileButton').onclick=()=>modal(`<h2>Seu perfil</h2><p class="dialog-sub">${esc(userEmail)}</p>${badge('Administrador')}<p class="dialog-sub">Acesso administrativo autenticado.</p>`);$('globalSearch').oninput=e=>{const query=e.target.value.toLowerCase();document.querySelectorAll('[data-route]').forEach(b=>b.hidden=!routes[b.dataset.route].toLowerCase().includes(query))};$('globalSearch').onkeydown=e=>{if(e.key==='Enter'){const b=[...document.querySelectorAll('[data-route]')].find(b=>!b.hidden);if(b){navigate(b.dataset.route);e.target.value='';e.target.dispatchEvent(new Event('input'))}}};document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'&&!$('adminPanel').hidden){e.preventDefault();$('globalSearch').focus()}if(e.key==='Escape')closeSidebar()});$('detailDialog').addEventListener('click',e=>{if(e.target===$('detailDialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}});
-if(client){client.auth.getUser().then(({data})=>{if(isAdmin(data?.user)){authorized=true;userEmail=data.user.email;showPanel()}}).catch(()=>{});client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||(session&&!isAdmin(session.user))){authorized=false;orders=[];loadedSettings=null;routeVersion++;$('adminPanel').hidden=true;$('loginScreen').hidden=false;$('adminContent').innerHTML='';$('detailDialog').close()}})}
+$('adminNav').innerHTML=Object.entries(routes).map(([id,label])=>`<button class="menu-item" data-route="${id}" title="${label}">${icon(id)}<span>${label}</span></button>`).join('');
+document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>navigate(b.dataset.route));
+$('searchIcon').innerHTML=icon('search');
+$('notificationsButton').innerHTML=icon('bell');
+$('mobileToggle').innerHTML=icon('logs');
+$('loginForm').onsubmit=login;
+$('logoutButton').onclick=async()=>{
+  try{if(client)await client.auth.signOut()}
+  finally{
+    authorized=false;
+    orders=[];
+    loadedSettings=null;
+    selection.clear();
+    routeVersion++;
+    $('adminPanel').hidden=true;
+    $('loginScreen').hidden=false;
+    $('adminContent').innerHTML='';
+    $('detailDialog').close();
+  }
+};
+$('refreshButton').onclick=()=>{loadedSettings=null;navigate(tab)};
+$('mobileToggle').onclick=()=>{
+  $('adminSidebar').classList.toggle('open');
+  $('sidebarBackdrop').hidden=!$('adminSidebar').classList.contains('open');
+};
+$('sidebarBackdrop').onclick=closeSidebar;
+$('collapseSidebar').onclick=()=>$('adminPanel').classList.toggle('collapsed');
+$('notificationsButton').onclick=()=>modal('<h2>Notificações</h2>'+empty('Você está em dia','Não há um serviço de notificações conectado neste projeto.'));
+$('profileButton').onclick=()=>modal(`<h2>Seu perfil</h2><p class="dialog-sub">${esc(userEmail)}</p>${badge('Administrador')}<p class="dialog-sub">Acesso administrativo autenticado.</p>`);
+$('globalSearch').oninput=e=>{
+  const query=e.target.value.toLowerCase();
+  document.querySelectorAll('[data-route]').forEach(b=>b.hidden=!routes[b.dataset.route].toLowerCase().includes(query));
+};
+$('globalSearch').onkeydown=e=>{
+  if(e.key==='Enter'){
+    const b=[...document.querySelectorAll('[data-route]')].find(b=>!b.hidden);
+    if(b){
+      navigate(b.dataset.route);
+      e.target.value='';
+      e.target.dispatchEvent(new Event('input'));
+    }
+  }
+};
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'&&!$('adminPanel').hidden){
+    e.preventDefault();
+    $('globalSearch').focus();
+  }
+  if(e.key==='Escape')closeSidebar();
+});
+$('detailDialog').addEventListener('click',e=>{
+  if(e.target===$('detailDialog')){
+    const r=e.target.getBoundingClientRect();
+    if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();
+  }
+});
+if(client){
+  client.auth.getUser().then(({data})=>{
+    if(isAdmin(data?.user)){
+      authorized=true;
+      userEmail=data.user.email;
+      showPanel();
+    }
+  }).catch(()=>{});
+  client.auth.onAuthStateChange((event,session)=>{
+    if(event==='SIGNED_OUT'||(session&&!isAdmin(session.user))){
+      authorized=false;
+      orders=[];
+      loadedSettings=null;
+      routeVersion++;
+      $('adminPanel').hidden=true;
+      $('loginScreen').hidden=false;
+      $('adminContent').innerHTML='';
+      $('detailDialog').close();
+    }
+  });
+}

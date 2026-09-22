@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Status do Pagamento — LovableUnlimited</title>
+  <title>Status da Entrega — LovableUnlimited</title>
   
-  <!-- SEO & Social Meta Tags -->
-  <meta name="description" content="Status e liberação de acesso ao LovableUnlimited.">
+  <meta name="description" content="Acompanhe o status da sua entrega e acesse sua chave/saldo no LovableUnlimited.">
   <meta name="robots" content="noindex, follow">
 
   <!-- ============================================================
@@ -16,23 +15,45 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link id="fontLink" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=7">
-  <link rel="stylesheet" href="redesign.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="redesign.css?v=8">
 
   <!-- Confetti Canvas Library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-  <style>
+  <style id="customThemeStyles">
+    :root {
+      --cfg-primary: #7c3aed;
+      --cfg-primary-hover: #6d28d9;
+      --cfg-bg: radial-gradient(ellipse at 50% 30%, #ede5fa 0%, #fcfbfe 60%);
+      --cfg-card-bg: rgba(255, 255, 255, 0.96);
+      --cfg-card-border: rgba(124, 58, 237, 0.16);
+      --cfg-text: #1e1b29;
+      --cfg-text-sub: #5d566b;
+      --cfg-btn-bg: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      --cfg-btn-text: #ffffff;
+      --cfg-radius: 28px;
+      --cfg-max-width: 620px;
+      --cfg-padding: 45px 35px;
+      --cfg-shadow: 0 25px 70px -15px rgba(100, 48, 176, 0.18);
+      --cfg-title-size: 32px;
+      --cfg-body-size: 15px;
+      --cfg-font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
     body {
-      background: radial-gradient(ellipse at 50% 30%, #ede5fa 0%, #fcfbfe 60%);
+      background: var(--cfg-bg);
+      font-family: var(--cfg-font);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      color: var(--cfg-text);
+      transition: background 0.3s ease;
     }
 
-    .thankyou-wrapper {
+    .delivery-wrapper {
       flex: 1;
       display: flex;
       align-items: center;
@@ -40,19 +61,20 @@
       padding: 40px 20px;
     }
 
-    .thankyou-card {
-      background: rgba(255, 255, 255, 0.96);
+    .delivery-card {
+      background: var(--cfg-card-bg);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(124, 58, 237, 0.18);
-      border-radius: 28px;
-      box-shadow: 0 25px 70px -15px rgba(100, 48, 176, 0.18);
-      max-width: 620px;
+      border: 1px solid var(--cfg-card-border);
+      border-radius: var(--cfg-radius);
+      box-shadow: var(--cfg-shadow);
+      max-width: var(--cfg-max-width);
       width: 100%;
-      padding: 45px 35px;
+      padding: var(--cfg-padding);
       text-align: center;
       position: relative;
       overflow: hidden;
       animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: all 0.3s ease;
     }
 
     @keyframes popIn {
@@ -67,7 +89,7 @@
       gap: 8px;
       padding: 8px 18px;
       border-radius: 999px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       margin-bottom: 24px;
     }
@@ -84,16 +106,22 @@
       border: 1px solid #fde68a;
     }
 
+    .badge-waiting {
+      background: #f5f3ff;
+      color: var(--cfg-primary);
+      border: 1px solid #ddd6fe;
+    }
+
     .badge-denied {
       background: #fef2f2;
       color: #dc2626;
       border: 1px solid #fecaca;
     }
 
-    /* Celebration & Status Icons */
+    /* Status Icons */
     .icon-circle {
-      width: 90px;
-      height: 90px;
+      width: 86px;
+      height: 86px;
       margin: 0 auto 20px;
       border-radius: 50%;
       color: white;
@@ -108,10 +136,15 @@
       animation: pulseGreen 2.5s infinite ease-in-out;
     }
 
+    .icon-waiting {
+      background: linear-gradient(135deg, var(--cfg-primary) 0%, var(--cfg-primary-hover) 100%);
+      box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.4);
+      animation: pulsePurple 2.5s infinite ease-in-out;
+    }
+
     .icon-pending {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       box-shadow: 0 15px 35px -5px rgba(245, 158, 11, 0.4);
-      animation: pulseAmber 2.5s infinite ease-in-out;
     }
 
     .icon-denied {
@@ -124,74 +157,209 @@
       50% { transform: scale(1.05); box-shadow: 0 20px 45px 0 rgba(16, 185, 129, 0.6); }
     }
 
-    @keyframes pulseAmber {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.04); }
+    @keyframes pulsePurple {
+      0%, 100% { transform: scale(1); box-shadow: 0 15px 35px -5px rgba(124, 58, 237, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 20px 45px 0 rgba(124, 58, 237, 0.6); }
     }
 
-    .thankyou-title {
-      font-size: clamp(26px, 4vw, 34px);
+    .delivery-title {
+      font-size: var(--cfg-title-size);
       font-weight: 750;
-      color: #1e1b29;
+      color: var(--cfg-text);
       letter-spacing: -0.03em;
       line-height: 1.2;
       margin-bottom: 12px;
     }
 
-    .thankyou-subtitle {
-      font-size: 15px;
-      color: #5d566b;
+    .delivery-subtitle {
+      font-size: var(--cfg-body-size);
+      color: var(--cfg-text-sub);
       line-height: 1.6;
-      max-width: 480px;
+      max-width: 490px;
       margin: 0 auto 24px;
     }
 
-    /* License Box */
-    .license-card {
+    /* ============================================================
+       TIMELINE DE ETAPAS DO PEDIDO
+       ============================================================ */
+    .timeline-container {
       background: #faf8fd;
+      border: 1px solid #ebdff8;
+      border-radius: 18px;
+      padding: 20px 16px;
+      margin: 0 auto 26px;
+      text-align: left;
+    }
+
+    .timeline-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cfg-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .timeline-steps {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      gap: 8px;
+    }
+
+    .timeline-steps::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: #e5daf3;
+      z-index: 1;
+    }
+
+    .timeline-step {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      text-align: center;
+    }
+
+    .step-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #d4c5eb;
+      color: #9d8db3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      margin-bottom: 8px;
+    }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #7b6f8a;
+      line-height: 1.2;
+    }
+
+    /* Estados da timeline */
+    .timeline-step.completed .step-dot {
+      background: #10b981;
+      border-color: #10b981;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .timeline-step.completed .step-label {
+      color: #059669;
+      font-weight: 700;
+    }
+
+    .timeline-step.active .step-dot {
+      background: var(--cfg-primary);
+      border-color: #ddd6fe;
+      color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+      animation: pulseDot 2s infinite;
+    }
+    .timeline-step.active .step-label {
+      color: var(--cfg-primary);
+      font-weight: 700;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* ============================================================
+       CARDS DE ENTREGA (SALDO / CHAVE / CONTEÚDO)
+       ============================================================ */
+    .delivery-content-box {
+      background: #f7f4fc;
       border: 1.5px solid #d8c8f5;
       border-radius: 18px;
-      padding: 20px;
+      padding: 24px;
       margin-bottom: 24px;
       text-align: center;
     }
 
-    .license-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: #7c3aed;
+    .content-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cfg-primary);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .license-input-wrap {
+    /* Saldo Card */
+    .balance-display {
+      background: #ffffff;
+      border: 1px solid #ebdff8;
+      border-radius: 14px;
+      padding: 18px 24px;
+      margin-bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.08);
+    }
+
+    .balance-amount {
+      font-size: clamp(28px, 5vw, 38px);
+      font-weight: 800;
+      color: var(--cfg-primary);
+      letter-spacing: -0.03em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .balance-tag {
+      text-align: left;
+      font-size: 12px;
+      color: #6a5d7c;
+      font-weight: 600;
+    }
+
+    /* Chave Card */
+    .key-input-wrap {
       display: flex;
       gap: 8px;
       justify-content: center;
-      max-width: 420px;
-      margin: 0 auto;
+      max-width: 440px;
+      margin: 0 auto 12px;
     }
 
-    .license-input {
+    .key-input {
       font-family: 'JetBrains Mono', monospace;
       font-size: 15px;
       font-weight: 700;
       color: #2e1d52;
       text-align: center;
-      background: #fff;
+      background: #ffffff;
       border: 1px solid #d8c8f5;
-      border-radius: 10px;
-      padding: 10px 14px;
+      border-radius: 12px;
+      padding: 12px 14px;
       flex: 1;
+      width: 100%;
     }
 
-    .copy-btn {
-      background: #7c3aed;
+    .btn-copy {
+      background: var(--cfg-primary);
       color: #fff;
       border: none;
-      padding: 10px 18px;
-      border-radius: 10px;
+      padding: 12px 20px;
+      border-radius: 12px;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
@@ -202,13 +370,26 @@
       flex-shrink: 0;
     }
 
-    .copy-btn:hover {
-      background: #6d28d9;
+    .btn-copy:hover {
+      background: var(--cfg-primary-hover);
     }
 
-    /* Order Details Table */
+    /* Mensagem Customizada Card */
+    .custom-message-box {
+      background: #ffffff;
+      border: 1px solid #ebdff8;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      color: #4b3e5e;
+      text-align: left;
+      line-height: 1.6;
+      margin-top: 12px;
+    }
+
+    /* Detalhes do Pedido */
     .details-table {
-      background: #f7f5fa;
+      background: #faf8fc;
       border-radius: 16px;
       padding: 16px 20px;
       margin-bottom: 24px;
@@ -220,7 +401,7 @@
       justify-content: space-between;
       padding: 8px 0;
       border-bottom: 1px solid #eeeaf3;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .dt-row:last-child {
@@ -236,19 +417,19 @@
       color: #211e2d;
     }
 
-    /* Actions */
+    /* Botões de Ação */
     .action-group {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .btn-download-main {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      color: #fff;
-      padding: 18px 24px;
+    .btn-main-cta {
+      background: var(--cfg-btn-bg);
+      color: var(--cfg-btn-text);
+      padding: 17px 24px;
       border-radius: 14px;
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       text-decoration: none;
       border: none;
@@ -257,19 +438,19 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 12px 28px -6px rgba(5, 150, 105, 0.4);
+      box-shadow: 0 12px 28px -6px rgba(124, 58, 237, 0.35);
       transition: all 0.2s ease;
       width: 100%;
     }
 
-    .btn-download-main:hover {
+    .btn-main-cta:hover {
       transform: translateY(-2px);
-      box-shadow: 0 16px 36px -6px rgba(5, 150, 105, 0.5);
+      box-shadow: 0 16px 36px -6px rgba(124, 58, 237, 0.45);
     }
 
     .btn-secondary {
       background: #f1ebfa;
-      color: #6d28d9;
+      color: var(--cfg-primary);
       border: 1px solid #d8c8f5;
       padding: 12px 20px;
       border-radius: 12px;
@@ -290,7 +471,7 @@
 
     .btn-back-home {
       color: #776d85;
-      font-size: 14px;
+      font-size: 13px;
       text-decoration: none;
       display: inline-block;
       margin-top: 14px;
@@ -301,142 +482,298 @@
       color: #211e2d;
     }
 
-    /* Spinner */
     .spin {
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+      .delivery-card {
+        padding: 30px 20px;
+      }
+      .timeline-steps {
+        gap: 4px;
+      }
+      .step-dot {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+      }
+      .step-label {
+        font-size: 9px;
+      }
+      .key-input-wrap {
+        flex-direction: column;
+      }
+      .btn-copy {
+        width: 100%;
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
 
   <!-- Navbar -->
-  <header class="navbar" style="position: relative;">
+  <header class="navbar" id="pageNavbar" style="position: relative;">
     <div class="nav-container">
-      <a href="index.html" class="nav-brand">
+      <a href="index.html" class="nav-brand" id="brandLogoWrap">
         <span class="brand-mark">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </span>
-        <span class="brand-text">LovableUnlimited</span>
+        <span class="brand-text">Lovable<strong>Unlimited</strong></span>
       </a>
-      <span id="navStatusBadge" style="font-size: 13px; font-weight: 600; color: #7c3aed; background: #f5f3ff; padding: 6px 12px; border-radius: 8px;">
+      <span id="navStatusBadge" style="font-size: 13px; font-weight: 600; color: #7c3aed; background: #f5f3ff; padding: 6px 14px; border-radius: 8px;">
         Verificando...
       </span>
     </div>
   </header>
 
-  <!-- Container Geral -->
-  <main class="thankyou-wrapper">
-    <div class="thankyou-card">
+  <!-- Container Geral da Entrega -->
+  <main class="delivery-wrapper">
+    <div class="delivery-card" id="mainDeliveryCard">
 
       <!-- ==========================================
-           ESTADO 1: CARREGANDO / VERIFICANDO
+           ESTADO: CARREGANDO
            ========================================== -->
-      <div id="stateLoading">
-        <div class="icon-circle icon-pending" style="background: #f1ebfa; color: #7c3aed;">
-          <svg class="spin" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+      <div id="viewLoading">
+        <div class="icon-circle icon-waiting" style="background: #f1ebfa; color: var(--cfg-primary);">
+          <svg class="spin" width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
         </div>
-        <h2 class="thankyou-title">Consultando Pagamento...</h2>
-        <p class="thankyou-subtitle">Estamos verificando o status do seu pedido com segurança.</p>
+        <h2 class="delivery-title">Verificando Pedido...</h2>
+        <p class="delivery-subtitle">Estamos conectando ao sistema para consultar o status da sua entrega.</p>
       </div>
 
       <!-- ==========================================
-           ESTADO 2: PAGAMENTO APROVADO (COM CONFETES!)
+           ESTADO 1: PAGAMENTO PENDENTE (PIX)
            ========================================== -->
-      <div id="stateApproved" style="display: none;">
-        <div class="status-badge badge-approved">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-          Pagamento Aprovado com Sucesso!
-        </div>
-
-        <div class="icon-circle icon-approved">
-          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-
-        <h1 class="thankyou-title">Parabéns<span id="apNameGreeting"></span>! 🎉</h1>
-        <p class="thankyou-subtitle">
-          Seu pagamento PIX foi confirmado. Seu acesso vitalício ao <strong>LovableUnlimited</strong> está 100% liberado!
-        </p>
-
-        <!-- Chave de Licença (se existir) -->
-        <div class="license-card" id="licenseWrap" style="display: none;">
-          <div class="license-label">Sua Chave de Licença Vitalícia</div>
-          <div class="license-input-wrap">
-            <input type="text" id="apLicenseKey" readonly class="license-input" value="">
-            <button class="copy-btn" id="btnCopyLicense" onclick="copyLicense()">
-              <span id="copyLicenseTxt">Copiar</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Tabela de Detalhes -->
-        <div class="details-table">
-          <div class="dt-row"><span class="dt-label">Protocolo:</span><span class="dt-val mono" id="apProto">—</span></div>
-          <div class="dt-row"><span class="dt-label">Cliente:</span><span class="dt-val" id="apCustomerName">—</span></div>
-          <div class="dt-row"><span class="dt-label">E-mail:</span><span class="dt-val" id="apEmail">—</span></div>
-          <div class="dt-row"><span class="dt-label">Valor Pago:</span><span class="dt-val" id="apPrice">R$ 97,00</span></div>
-          <div class="dt-row"><span class="dt-label">Status:</span><span class="dt-val" style="color: #059669;">✅ Aprovado</span></div>
-        </div>
-
-        <!-- Ações: Download & Confetes -->
-        <div class="action-group">
-          <button class="btn-download-main" onclick="downloadProduct()">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            BAIXAR LOVABLEUNLIMITED AGORA
-          </button>
-
-          <button class="btn-secondary" onclick="fireCelebration()">
-            🎊 Soltar mais confetes comemorativos!
-          </button>
-        </div>
-      </div>
-
-      <!-- ==========================================
-           ESTADO 3: PENDENTE (AGUARDANDO CONFIRMAÇÃO DO PIX)
-           ========================================== -->
-      <div id="statePending" style="display: none;">
+      <div id="viewPaymentPending" style="display: none;">
         <div class="status-badge badge-pending">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          Aguardando Confirmação do PIX
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Aguardando Confirmação do Pagamento
         </div>
 
         <div class="icon-circle icon-pending">
           <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
 
-        <h1 class="thankyou-title">Pedido em Processamento</h1>
-        <p class="thankyou-subtitle">
-          Recebemos a solicitação do seu pedido. Assim que o pagamento via PIX for aprovado, esta tela atualizará automaticamente liberando seu download e sua licença.
+        <h1 class="delivery-title" id="txtTitlePaymentPending">Pagamento em Análise</h1>
+        <p class="delivery-subtitle" id="txtSubPaymentPending">
+          Recebemos o registro do seu pedido. Assim que o pagamento via PIX for identificado pelo administrador, seu pedido entrará na fila de entrega.
         </p>
 
+        <!-- Timeline 4 Etapas -->
+        <div class="timeline-container" id="timelineWrapPending">
+          <div class="timeline-title">Progresso do Pedido</div>
+          <div class="timeline-steps">
+            <div class="timeline-step active">
+              <div class="step-dot">1</div>
+              <div class="step-label">Pagamento Realizado</div>
+            </div>
+            <div class="timeline-step">
+              <div class="step-dot">2</div>
+              <div class="step-label">Pagamento Confirmado</div>
+            </div>
+            <div class="timeline-step">
+              <div class="step-dot">3</div>
+              <div class="step-label">Preparando Entrega</div>
+            </div>
+            <div class="timeline-step">
+              <div class="step-dot">4</div>
+              <div class="step-label">Entrega Concluída</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Protocolo -->
-        <div class="license-card">
-          <div class="license-label">Seu Protocolo</div>
-          <div class="license-input-wrap">
-            <input type="text" id="pendingProtoInput" readonly class="license-input" value="">
-            <button class="copy-btn" onclick="copyPendingProto()">
-              <span id="copyProtoTxt">Copiar</span>
+        <div class="delivery-content-box" style="margin-top: 10px;">
+          <span class="content-badge">Seu Protocolo</span>
+          <div class="key-input-wrap">
+            <input type="text" id="pendingProtoDisplay" readonly class="key-input" value="">
+            <button class="btn-copy" onclick="copyValue('pendingProtoDisplay', 'btnCopyPendingProto')">
+              <span id="btnCopyPendingProto">Copiar</span>
             </button>
           </div>
         </div>
 
         <div class="action-group">
-          <button class="btn-secondary" id="btnRefreshStatus" onclick="checkOrderStatus(true)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Verificar se já foi aprovado
+          <button class="btn-secondary" onclick="checkOrderStatus(true)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Verificar se o pagamento já foi confirmado
           </button>
         </div>
-        <p style="font-size: 12px; color: #8c829c; margin-top: 15px;">
-          ⏱️ A página checa automaticamente a cada 10 segundos.
-        </p>
       </div>
 
       <!-- ==========================================
-           ESTADO 4: NÃO AUTORIZADO / SEM PEDIDO
+           ESTADO 2: PAGAMENTO CONFIRMADO — AGUARDANDO ENTREGA
            ========================================== -->
-      <div id="stateUnauthorized" style="display: none;">
+      <div id="viewAwaitingDelivery" style="display: none;">
+        <div class="status-badge badge-waiting">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Pagamento Confirmado · Aguardando Entrega
+        </div>
+
+        <div class="icon-circle icon-waiting">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+
+        <h1 class="delivery-title" id="txtTitleAwaiting">Pagamento aprovado!</h1>
+        <p class="delivery-subtitle" id="txtSubAwaiting">
+          Seu pagamento foi confirmado com sucesso. Agora estamos preparando sua entrega.
+        </p>
+
+        <!-- Timeline 4 Etapas (Passo 3 Ativo) -->
+        <div class="timeline-container" id="timelineWrapAwaiting">
+          <div class="timeline-title">Progresso do Pedido</div>
+          <div class="timeline-steps">
+            <div class="timeline-step completed">
+              <div class="step-dot">✓</div>
+              <div class="step-label">Pagamento Realizado</div>
+            </div>
+            <div class="timeline-step completed">
+              <div class="step-dot">✓</div>
+              <div class="step-label">Pagamento Confirmado</div>
+            </div>
+            <div class="timeline-step active">
+              <div class="step-dot">●</div>
+              <div class="step-label">Preparando Entrega</div>
+            </div>
+            <div class="timeline-step">
+              <div class="step-dot">4</div>
+              <div class="step-label">Entrega Concluída</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Box Informativo de Espera -->
+        <div class="delivery-content-box" style="background: #faf8fe;">
+          <span class="content-badge">Status do Pedido</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #ebdff8;">
+              <span style="font-size: 11px; color: #766989; display: block;">Pagamento</span>
+              <strong style="color: #059669; font-size: 14px;">✓ Confirmado</strong>
+            </div>
+            <div style="background: #ffffff; padding: 12px; border-radius: 12px; border: 1px solid #ebdff8;">
+              <span style="font-size: 11px; color: #766989; display: block;">Entrega</span>
+              <strong style="color: var(--cfg-primary); font-size: 14px;">● Aguardando</strong>
+            </div>
+          </div>
+          <p style="font-size: 13px; color: #6a5d7c; line-height: 1.6;">
+            Você pode deixar esta página aberta ou voltar mais tarde. O status será atualizado automaticamente quando sua entrega estiver pronta.
+          </p>
+        </div>
+
+        <div class="action-group">
+          <button class="btn-secondary" onclick="checkOrderStatus(true)">
+            <svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>
+            Verificar se a entrega foi liberada
+          </button>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           ESTADO 3: ENTREGA CONCLUÍDA (COM CONFETES!)
+           ========================================== -->
+      <div id="viewDelivered" style="display: none;">
+        <div class="status-badge badge-approved">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          Entrega Concluída com Sucesso!
+        </div>
+
+        <div class="icon-circle icon-approved">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+
+        <h1 class="delivery-title" id="txtTitleDelivered">Tudo pronto! 🎉</h1>
+        <p class="delivery-subtitle" id="txtSubDelivered">
+          Sua entrega foi concluída com sucesso. Aproveite seu acesso!
+        </p>
+
+        <!-- Timeline 4 Etapas (100% Concluída) -->
+        <div class="timeline-container" id="timelineWrapDelivered">
+          <div class="timeline-title">Progresso do Pedido</div>
+          <div class="timeline-steps">
+            <div class="timeline-step completed">
+              <div class="step-dot">✓</div>
+              <div class="step-label">Pagamento Realizado</div>
+            </div>
+            <div class="timeline-step completed">
+              <div class="step-dot">✓</div>
+              <div class="step-label">Pagamento Confirmado</div>
+            </div>
+            <div class="timeline-step completed">
+              <div class="step-dot">✓</div>
+              <div class="step-label">Preparando Entrega</div>
+            </div>
+            <div class="timeline-step completed">
+              <div class="step-dot">✓</div>
+              <div class="step-label">Entrega Concluída</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Box com Conteúdo da Entrega (Saldo / Chave / Mensagem) -->
+        <div class="delivery-content-box" id="deliveryCardWrap">
+          <span class="content-badge">Dados Entregues</span>
+
+          <!-- Seção de Saldo -->
+          <div id="secDeliveredBalance" style="display: none;">
+            <div class="balance-display">
+              <div class="balance-amount" id="valDeliveredBalance">500</div>
+              <div class="balance-tag">
+                <strong>Créditos / Saldo</strong>
+                <span>Adicionado com sucesso</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Chave -->
+          <div id="secDeliveredKey" style="display: none;">
+            <p style="font-size: 13px; color: #625575; margin-bottom: 8px; font-weight: 600;">Sua Chave de Ativação:</p>
+            <div class="key-input-wrap">
+              <input type="text" id="valDeliveredKey" readonly class="key-input" value="">
+              <button class="btn-copy" id="btnCopyKey" onclick="copyValue('valDeliveredKey', 'copyKeyText')">
+                <span id="copyKeyText">Copiar chave</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mensagem Personalizada da Entrega -->
+          <div id="secDeliveredMessage" class="custom-message-box" style="display: none;">
+            <strong style="color: var(--cfg-primary); display: block; margin-bottom: 4px;">Informações da Entrega:</strong>
+            <span id="valDeliveredMessage"></span>
+          </div>
+        </div>
+
+        <!-- Tabela de Detalhes do Pedido -->
+        <div class="details-table" id="orderDetailsWrap">
+          <div class="dt-row" id="rowOrderProto"><span class="dt-label">Número do Pedido:</span><span class="dt-val mono" id="infoOrderProto">—</span></div>
+          <div class="dt-row" id="rowOrderProduct"><span class="dt-label">Produto:</span><span class="dt-val">LovableUnlimited Vitalício</span></div>
+          <div class="dt-row" id="rowOrderCustomer"><span class="dt-label">Cliente:</span><span class="dt-val" id="infoOrderCustomer">—</span></div>
+          <div class="dt-row" id="rowOrderDate"><span class="dt-label">Data da Entrega:</span><span class="dt-val" id="infoOrderDeliveredAt">—</span></div>
+          <div class="dt-row"><span class="dt-label">Status:</span><span class="dt-val" style="color: #059669;">✅ Entregue</span></div>
+        </div>
+
+        <!-- Ações -->
+        <div class="action-group">
+          <button class="btn-main-cta" id="btnDownloadProduct" onclick="downloadProduct()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar Extensão LovableUnlimited
+          </button>
+
+          <button class="btn-secondary" id="btnMoreConfetti" onclick="fireElegantConfetti()">
+            🎊 Soltar mais confetes!
+          </button>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           ESTADO 4: ACESSO BLOQUEADO / NÃO ENCONTRADO
+           ========================================== -->
+      <div id="viewUnauthorized" style="display: none;">
         <div class="status-badge badge-denied">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           Acesso Restrito
         </div>
 
@@ -444,14 +781,14 @@
           <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
 
-        <h1 class="thankyou-title">Nenhum Pedido Aprovado</h1>
-        <p class="thankyou-subtitle">
-          Para acessar o download do LovableUnlimited e sua licença, é necessário realizar o pedido na página inicial.
+        <h1 class="delivery-title">Nenhum Pedido Localizado</h1>
+        <p class="delivery-subtitle">
+          Não localizamos nenhum pedido ativo para este endereço. Para obter seu acesso e chave, conclua o pedido na página inicial.
         </p>
 
         <div class="action-group">
-          <a href="index.html" class="btn-download-main" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
-            Ir para a Página de Vendas
+          <a href="index.html" class="btn-main-cta">
+            Ir para a Página Inicial
           </a>
         </div>
       </div>
@@ -475,37 +812,44 @@
     let DOWNLOAD_URL = 'lovableunlimited.zip';
     let currentProtocol = '';
     let autoPollingInterval = null;
+    let hasCelebrated = false;
 
-    // Alternar visualização dos estados
+    // Alternar estados visuais
     function showState(state) {
-      document.getElementById('stateLoading').style.display = 'none';
-      document.getElementById('stateApproved').style.display = 'none';
-      document.getElementById('statePending').style.display = 'none';
-      document.getElementById('stateUnauthorized').style.display = 'none';
+      document.getElementById('viewLoading').style.display = 'none';
+      document.getElementById('viewPaymentPending').style.display = 'none';
+      document.getElementById('viewAwaitingDelivery').style.display = 'none';
+      document.getElementById('viewDelivered').style.display = 'none';
+      document.getElementById('viewUnauthorized').style.display = 'none';
 
       const navBadge = document.getElementById('navStatusBadge');
 
-      if (state === 'approved') {
-        document.getElementById('stateApproved').style.display = 'block';
-        navBadge.textContent = '✅ Aprovado';
+      if (state === 'delivered') {
+        document.getElementById('viewDelivered').style.display = 'block';
+        navBadge.textContent = '✅ Entregue';
         navBadge.style.color = '#059669';
         navBadge.style.background = '#ecfdf5';
-      } else if (state === 'pending') {
-        document.getElementById('statePending').style.display = 'block';
-        navBadge.textContent = '⏳ Em Análise';
+      } else if (state === 'awaiting_delivery') {
+        document.getElementById('viewAwaitingDelivery').style.display = 'block';
+        navBadge.textContent = '● Preparando Entrega';
+        navBadge.style.color = 'var(--cfg-primary)';
+        navBadge.style.background = '#f5f3ff';
+      } else if (state === 'payment_pending') {
+        document.getElementById('viewPaymentPending').style.display = 'block';
+        navBadge.textContent = '⏳ Pagamento em Análise';
         navBadge.style.color = '#d97706';
         navBadge.style.background = '#fffbeb';
       } else if (state === 'unauthorized') {
-        document.getElementById('stateUnauthorized').style.display = 'block';
+        document.getElementById('viewUnauthorized').style.display = 'block';
         navBadge.textContent = '🔒 Bloqueado';
         navBadge.style.color = '#dc2626';
         navBadge.style.background = '#fef2f2';
       } else {
-        document.getElementById('stateLoading').style.display = 'block';
+        document.getElementById('viewLoading').style.display = 'block';
       }
     }
 
-    // Função de checagem do pedido no Supabase
+    // Consulta de status com polling
     async function checkOrderStatus(isManual = false) {
       const urlParams = new URLSearchParams(window.location.search);
       currentProtocol = (urlParams.get('proto') || '').trim();
@@ -513,11 +857,6 @@
       if (!currentProtocol) {
         showState('unauthorized');
         return;
-      }
-
-      if (isManual) {
-        const btn = document.getElementById('btnRefreshStatus');
-        if (btn) btn.innerHTML = '<span class="spin">⟳</span> Verificando...';
       }
 
       try {
@@ -534,82 +873,102 @@
           return;
         }
 
-        // Tentar obter download_url das configurações
-        try {
-          const { data: setts } = await supabaseClient.from('settings').select('download_url').single();
-          if (setts && setts.download_url) DOWNLOAD_URL = setts.download_url;
-        } catch(e){}
+        // 1. Verificar status geral
+        const isPaymentConfirmed = data.payment_status === 'payment_confirmed' || data.status === 'payment_confirmed' || data.status === 'approved';
+        const isDelivered = data.delivery_status === 'delivered' || (data.status === 'approved' && (data.license_key || data.delivery_payload));
 
-        if (data.status === 'approved') {
-          // Parar polling se aprovado
+        if (isDelivered) {
+          // ESTADO 3: ENTREGA CONCLUÍDA
           if (autoPollingInterval) clearInterval(autoPollingInterval);
 
-          document.getElementById('apProto').textContent = data.protocol;
-          document.getElementById('apCustomerName').textContent = data.name || 'Cliente';
-          document.getElementById('apEmail').textContent = data.email || '—';
-          if (data.amount) {
-            document.getElementById('apPrice').textContent = `R$ ${Number(data.amount).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-          }
-          if (data.name) {
-            document.getElementById('apNameGreeting').textContent = ', ' + data.name.split(' ')[0];
+          document.getElementById('infoOrderProto').textContent = data.protocol;
+          document.getElementById('infoOrderCustomer').textContent = data.name || 'Cliente';
+          
+          const deliveredDate = data.delivered_at || data.approved_at || data.created_at;
+          document.getElementById('infoOrderDeliveredAt').textContent = new Date(deliveredDate).toLocaleDateString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+          });
+
+          // Preencher saldo se existir
+          let hasContent = false;
+          let payload = null;
+          try {
+            payload = typeof data.delivery_payload === 'string' ? JSON.parse(data.delivery_payload) : data.delivery_payload;
+          } catch(e) {
+            payload = { custom_message: data.delivery_payload };
           }
 
-          // Licença
-          const licWrap = document.getElementById('licenseWrap');
-          if (data.license_key) {
-            licWrap.style.display = 'block';
-            document.getElementById('apLicenseKey').value = data.license_key;
+          // Exibir Saldo
+          if (payload && payload.balance) {
+            document.getElementById('secDeliveredBalance').style.display = 'block';
+            document.getElementById('valDeliveredBalance').textContent = payload.balance;
+            hasContent = true;
           } else {
-            licWrap.style.display = 'none';
+            document.getElementById('secDeliveredBalance').style.display = 'none';
           }
 
-          showState('approved');
-
-          // Disparar confetes se ainda não disparou
-          if (!window.celebrated) {
-            window.celebrated = true;
-            setTimeout(fireCelebration, 200);
-            setTimeout(fireCelebration, 1200);
+          // Exibir Chave
+          const activeKey = (payload && payload.key) || data.license_key;
+          if (activeKey) {
+            document.getElementById('secDeliveredKey').style.display = 'block';
+            document.getElementById('valDeliveredKey').value = activeKey;
+            hasContent = true;
+          } else {
+            document.getElementById('secDeliveredKey').style.display = 'none';
           }
+
+          // Exibir Mensagem Customizada
+          const activeMsg = (payload && payload.custom_message);
+          if (activeMsg) {
+            document.getElementById('secDeliveredMessage').style.display = 'block';
+            document.getElementById('valDeliveredMessage').textContent = activeMsg;
+            hasContent = true;
+          } else {
+            document.getElementById('secDeliveredMessage').style.display = 'none';
+          }
+
+          // Se nenhum payload específico estiver preenchido, exibir chave padrão ou aviso de entrega
+          if (!hasContent) {
+            document.getElementById('secDeliveredKey').style.display = 'block';
+            document.getElementById('valDeliveredKey').value = data.license_key || 'ACESSO-VITALICIO-LIBERADO';
+          }
+
+          showState('delivered');
+
+          // Disparar confetes elegantes apenas uma vez
+          if (!hasCelebrated) {
+            hasCelebrated = true;
+            setTimeout(fireElegantConfetti, 250);
+          }
+        } else if (isPaymentConfirmed) {
+          // ESTADO 2: AGUARDANDO ENTREGA
+          showState('awaiting_delivery');
         } else {
-          // Status Pendente
-          document.getElementById('pendingProtoInput').value = data.protocol;
-          showState('pending');
+          // ESTADO 1: PAGAMENTO PENDENTE
+          document.getElementById('pendingProtoDisplay').value = data.protocol;
+          showState('payment_pending');
         }
       } catch(err) {
-        console.warn('Erro ao consultar status:', err);
+        console.warn('Erro ao verificar status:', err);
         showState('unauthorized');
-      } finally {
-        if (isManual) {
-          const btn = document.getElementById('btnRefreshStatus');
-          if (btn) btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Verificar se já foi aprovado';
-        }
       }
     }
 
-    // Copiar Licença
-    function copyLicense() {
-      const val = document.getElementById('apLicenseKey').value;
-      if (!val) return;
-      navigator.clipboard.writeText(val).then(() => {
-        const txt = document.getElementById('copyLicenseTxt');
-        txt.textContent = 'Copiado!';
-        setTimeout(() => txt.textContent = 'Copiar', 2000);
+    // Copiar valor com feedback
+    function copyValue(inputId, btnTextId) {
+      const input = document.getElementById(inputId);
+      if (!input || !input.value) return;
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById(btnTextId);
+        const originalText = btn ? btn.textContent : 'Copiar';
+        if (btn) btn.textContent = 'Copiado!';
+        setTimeout(() => {
+          if (btn) btn.textContent = originalText;
+        }, 2000);
       });
     }
 
-    // Copiar Protocolo Pendente
-    function copyPendingProto() {
-      const val = document.getElementById('pendingProtoInput').value;
-      if (!val) return;
-      navigator.clipboard.writeText(val).then(() => {
-        const txt = document.getElementById('copyProtoTxt');
-        txt.textContent = 'Copiado!';
-        setTimeout(() => txt.textContent = 'Copiar', 2000);
-      });
-    }
-
-    // Baixar Produto
+    // Baixar arquivo do produto
     async function downloadProduct() {
       if (supabaseClient && currentProtocol) {
         try {
@@ -622,32 +981,84 @@
       a.click();
     }
 
-    // Confetes Elegantes e Festivos
-    function fireCelebration() {
+    // Confetes Elegantes (disparados 1 vez)
+    function fireElegantConfetti() {
       if (typeof confetti !== 'function') return;
-
-      const count = 220;
-      const defaults = { origin: { y: 0.65 } };
-
-      function fire(particleRatio, opts) {
-        confetti(Object.assign({}, defaults, opts, {
-          particleCount: Math.floor(count * particleRatio)
-        }));
-      }
-
-      fire(0.25, { spread: 35, startVelocity: 55, colors: ['#7c3aed', '#10b981', '#f59e0b'] });
-      fire(0.2, { spread: 65, colors: ['#a855f7', '#3b82f6', '#ec4899'] });
-      fire(0.35, { spread: 100, decay: 0.91, scalar: 0.9, colors: ['#8b5cf6', '#10b981', '#ffffff'] });
-      fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, colors: ['#c084fc', '#34d399', '#f43f5e'] });
-      fire(0.1, { spread: 120, startVelocity: 45, colors: ['#7c3aed', '#6366f1'] });
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#7c3aed', '#10b981', '#f59e0b', '#3b82f6', '#ec4899']
+      });
     }
 
-    // Iniciar checagem ao carregar e polling a cada 10s
-    window.addEventListener('DOMContentLoaded', () => {
+    // Carregar configurações visuais personalizadas do Supabase
+    async function applyCustomDeliveryTheme() {
+      if (!supabaseClient) return;
+      try {
+        const { data, error } = await supabaseClient.from('settings').select('*').single();
+        if (error || !data) return;
+
+        if (data.download_url) DOWNLOAD_URL = data.download_url;
+
+        const cfg = data.delivery_page_config;
+        if (!cfg) return;
+
+        const root = document.documentElement;
+
+        // Cores
+        if (cfg.primaryColor) {
+          root.style.setProperty('--cfg-primary', cfg.primaryColor);
+          root.style.setProperty('--cfg-btn-bg', cfg.primaryColor);
+        }
+        if (cfg.bgColor) root.style.setProperty('--cfg-bg', cfg.bgColor);
+        if (cfg.cardBgColor) root.style.setProperty('--cfg-card-bg', cfg.cardBgColor);
+        if (cfg.textColor) root.style.setProperty('--cfg-text', cfg.textColor);
+        if (cfg.textSubColor) root.style.setProperty('--cfg-text-sub', cfg.textSubColor);
+        if (cfg.btnBgColor) root.style.setProperty('--cfg-btn-bg', cfg.btnBgColor);
+        if (cfg.btnTextColor) root.style.setProperty('--cfg-btn-text', cfg.btnTextColor);
+
+        // Layout
+        if (cfg.borderRadius) root.style.setProperty('--cfg-radius', cfg.borderRadius + 'px');
+        if (cfg.maxWidth) root.style.setProperty('--cfg-max-width', cfg.maxWidth + 'px');
+        if (cfg.padding) root.style.setProperty('--cfg-padding', cfg.padding + 'px');
+
+        // Tipografia
+        if (cfg.fontFamily) root.style.setProperty('--cfg-font', cfg.fontFamily);
+        if (cfg.titleSize) root.style.setProperty('--cfg-title-size', cfg.titleSize + 'px');
+        if (cfg.bodySize) root.style.setProperty('--cfg-body-size', cfg.bodySize + 'px');
+
+        // Textos Customizados
+        if (cfg.titleAwaiting) document.getElementById('txtTitleAwaiting').textContent = cfg.titleAwaiting;
+        if (cfg.subAwaiting) document.getElementById('txtSubAwaiting').textContent = cfg.subAwaiting;
+        if (cfg.titleDelivered) document.getElementById('txtTitleDelivered').textContent = cfg.titleDelivered;
+        if (cfg.subDelivered) document.getElementById('txtSubDelivered').textContent = cfg.subDelivered;
+
+        // Toggles de Elementos
+        if (cfg.showLogo === false) document.getElementById('brandLogoWrap').style.display = 'none';
+        if (cfg.showTimeline === false) {
+          document.getElementById('timelineWrapPending').style.display = 'none';
+          document.getElementById('timelineWrapAwaiting').style.display = 'none';
+          document.getElementById('timelineWrapDelivered').style.display = 'none';
+        }
+        if (cfg.showOrderProto === false) document.getElementById('rowOrderProto').style.display = 'none';
+        if (cfg.showProductInfo === false) document.getElementById('rowOrderProduct').style.display = 'none';
+        if (cfg.showDeliveredDate === false) document.getElementById('rowOrderDate').style.display = 'none';
+        if (cfg.showDeliveryCard === false) document.getElementById('deliveryCardWrap').style.display = 'none';
+      } catch(e) {
+        console.warn('Erro ao carregar tema personalizado:', e);
+      }
+    }
+
+    // Inicialização
+    window.addEventListener('DOMContentLoaded', async () => {
+      await applyCustomDeliveryTheme();
       checkOrderStatus();
+
+      // Polling a cada 5 segundos para atualizar o status sem o cliente precisar recarregar
       autoPollingInterval = setInterval(() => {
         checkOrderStatus();
-      }, 10000);
+      }, 5000);
     });
   </script>
 </body>
