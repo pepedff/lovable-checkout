@@ -368,3 +368,135 @@ html{scroll-behavior:smooth}
 .plan-pill-btn:hover{border-color:#c4b5fd;background:#fff;transform:translateY(-1px)}
 .plan-pill-btn.active{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(124,58,237,0.18)}
 
+
+/* ==================================================================
+   MELHORIAS v2 — mesmo visual claro e roxo, com mais acabamento.
+   Foco no que o redesign.css não cobre: termos, checkout, planos,
+   formulários e telas de resultado. Para desfazer, apague este bloco.
+   ================================================================== */
+
+:root {
+  /* CORRIGIDO: era usada nos planos mas não existia */
+  --text-1: var(--text);
+  --ease-soft: cubic-bezier(.22, 1, .36, 1);
+  --purple-grad: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+}
+
+/* ---------- Troca de tela (Termos → Checkout → Pedido → Status) ----------
+   Cada tela entra com um leve fade + subida em vez de aparecer seca. */
+.page-view { animation: view-in .55s var(--ease-soft); }
+@keyframes view-in { from { opacity: 0; transform: translateY(14px); } }
+
+/* ---------- Botões ---------- */
+.btn-primary, .btn-sm-purple, .sp-icon, .brand-mark { background: var(--purple-grad); }
+.btn-primary { box-shadow: 0 10px 24px -12px rgba(124, 58, 237, .65); }
+.btn-primary:hover:not(:disabled) { background: var(--purple-grad); filter: brightness(1.07); transform: translateY(-1px); box-shadow: 0 14px 30px -12px rgba(124, 58, 237, .75); }
+.btn-primary:active:not(:disabled) { background: var(--purple-grad); filter: brightness(.95); }
+.btn-primary:disabled { box-shadow: none; filter: grayscale(.3); }
+.btn-sm-purple { transition: filter var(--t), transform var(--t); }
+.btn-sm-purple:hover { background: var(--purple-grad); filter: brightness(1.1); }
+.btn-sm-purple:active { transform: scale(.95); }
+.btn-outline:active { transform: scale(.97); }
+.btn-back { display: inline-flex; align-items: center; gap: .35rem; transition: color var(--t), transform var(--t); }
+.btn-back:hover { transform: translateX(-3px); }
+
+/* ---------- Termos ---------- */
+.terms-top-bar { background: radial-gradient(40rem 12rem at 50% 0%, #f1eafe, transparent 70%), var(--surface); }
+.terms-page-title { font-size: clamp(1.7rem, 3.5vw, 2.3rem); }
+.sb-link { position: relative; }
+.sb-link.active { box-shadow: inset 0 0 0 1px var(--primary-border); }
+.t-section h2 { display: flex; align-items: center; gap: .6rem; }
+.t-section h2::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+.t-callout { border-left-width: 4px !important; }
+.t-callout-important { border-left-color: var(--primary) !important; }
+.t-callout-warning { border-left-color: #f59e0b !important; }
+
+/* ---------- Cartão de aceite ---------- */
+.accept-card { border-radius: 24px; position: relative; overflow: hidden; }
+.accept-card::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--purple-grad); opacity: .9;
+}
+.chk-row { position: relative; }
+.chk-row:has(.chk-input:checked) { border-color: #c9b1e9; background: #f7f2fe; }
+.chk-row:has(.chk-input:checked) .chk-text { color: var(--text); }
+.chk-input:checked + .chk-box { background: var(--purple-grad); box-shadow: 0 4px 12px -4px rgba(124, 58, 237, .6); }
+.chk-input:focus-visible + .chk-box { outline: 3px solid #9362e8; outline-offset: 3px; }
+/* O "check" agora se desenha ao marcar */
+.chk-box svg polyline { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .4s .08s var(--ease-soft); }
+.chk-input:checked + .chk-box svg polyline { stroke-dashoffset: 0; }
+
+/* ---------- Campos ---------- */
+.form-input { transition: border-color .25s, box-shadow .25s, background .25s; }
+.form-input:hover:not(:focus):not(:disabled) { border-color: #cbd5e1; }
+.form-input:focus { box-shadow: 0 0 0 4px rgba(124, 58, 237, .14); }
+/* Borda vermelha só depois que a pessoa sai do campo com algo inválido (ex.: e-mail errado) */
+.form-input:user-invalid { border-color: var(--error); box-shadow: 0 0 0 4px rgba(239, 68, 68, .1); }
+.form-input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #fff inset; -webkit-text-fill-color: var(--text); }
+.form-label { color: var(--text-2); }
+
+/* ---------- Checkout ---------- */
+.checkout-secure { color: var(--success); background: var(--success-soft); border: 1px solid var(--success-border); padding: .3rem .7rem; border-radius: 999px; }
+.co-left, .co-right .summary-card { border-radius: 24px; }
+.co-heading { font-size: 1.7rem; }
+.pix-section-title svg { color: #f59e0b; }
+.pix-box { border-style: dashed; border-color: #d8ccef; background: #fbf9ff; }
+.pix-copy-row .form-input { text-overflow: ellipsis; }
+
+/* ---------- Seletor de planos ---------- */
+.plan-hero-card, .plan-pill-btn { transition: border-color .3s, transform .35s var(--ease-soft), box-shadow .35s, background .3s; }
+.plan-hero-card:active, .plan-pill-btn:active { transform: scale(.98); }
+.plan-hero-card.active { box-shadow: 0 0 0 3px rgba(124, 58, 237, .18), 0 18px 40px -24px rgba(124, 58, 237, .6); }
+.plan-pill-btn { position: relative; }
+.plan-pill-btn.active { transform: translateY(-2px); }
+/* bolinha de "selecionado" no canto do botão ativo */
+.plan-pill-btn.active::after {
+  content: "✓"; position: absolute; top: -7px; right: -7px; width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff;
+  background: var(--purple-grad); box-shadow: 0 3px 8px -2px rgba(124, 58, 237, .6);
+  animation: pop-in .35s var(--ease-soft);
+}
+/* brilho passando no selo "Mais Escolhido" */
+.plan-badge-tag { background: linear-gradient(110deg, #7c3aed 40%, #b794f6 50%, #7c3aed 60%); background-size: 250% 100%; animation: badge-shine 3.5s ease-in-out infinite; box-shadow: 0 6px 14px -6px rgba(124, 58, 237, .7); }
+@keyframes badge-shine { 0%, 60% { background-position: 100% 0; } 100% { background-position: -50% 0; } }
+
+/* ---------- Resumo do pedido ---------- */
+.summary-total-box { background: linear-gradient(135deg, #faf7ff, #f5f0ff); border-color: #e3d6f8; }
+.st-amt { background: var(--purple-grad); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.sl-coupon, .sl-discount { animation: view-in .4s var(--ease-soft); }
+
+/* ---------- Telas de resultado e status ---------- */
+.result-card, .status-card { border-radius: 24px; }
+.result-icon { position: relative; animation: pop-in .6s var(--ease-soft); }
+.result-icon::after {
+  content: ""; position: absolute; inset: -2px; border-radius: 50%; border: 2px solid currentColor; opacity: 0;
+  animation: ring-out 2.2s ease-out .4s infinite;
+}
+@keyframes pop-in { from { transform: scale(.4); opacity: 0; } }
+@keyframes ring-out { 0% { transform: scale(1); opacity: .45; } 100% { transform: scale(1.6); opacity: 0; } }
+.result-pending svg polyline { transform-origin: 12px 12px; animation: clock-hand 6s linear infinite; }
+@keyframes clock-hand { to { transform: rotate(360deg); } }
+.protocol-box { border-style: dashed; }
+.protocol-row code { letter-spacing: .06em; }
+.status-badge { border-radius: 999px; }
+.status-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.status-badge.badge-pending::before { animation: pill-pulse 1.8s ease-out infinite; }
+@keyframes pill-pulse { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, .5); } 70%, 100% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); } }
+.receipt-table { background: #fbfaff; }
+.download-ready { animation: view-in .5s var(--ease-soft); }
+.download-ready svg { animation: nudge-down 1.6s ease-in-out infinite; }
+@keyframes nudge-down { 50% { transform: translateY(3px); } }
+
+/* ---------- Menu do celular ---------- */
+@media (max-width: 768px) {
+  .nav-links { transition: transform .45s var(--ease-soft); }
+  .nav-links.open .nav-link { animation: view-in .45s var(--ease-soft) both; }
+  .nav-links.open .nav-link:nth-child(2) { animation-delay: .04s; }
+  .nav-links.open .nav-link:nth-child(3) { animation-delay: .08s; }
+  .nav-links.open .nav-link:nth-child(4) { animation-delay: .12s; }
+}
+
+/* Quem pede "reduzir movimento" no sistema vê tudo sem animação */
+@media (prefers-reduced-motion: reduce) {
+  .page-view, .result-icon, .result-icon::after, .result-pending svg polyline, .download-ready svg,
+  .plan-badge-tag, .status-badge::before, .plan-pill-btn.active::after { animation: none !important; }
+}
