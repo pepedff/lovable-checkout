@@ -12,3 +12,181 @@
 .terms-scroll-box::-webkit-scrollbar-track { background: #f1ebfa; border-radius: 4px; }
 .terms-scroll-box::-webkit-scrollbar-thumb { background: #c9b1e9; border-radius: 4px; }
 .terms-scroll-box::-webkit-scrollbar-thumb:hover { background: #9a70cc; }
+
+
+/* ==================================================================
+   MELHORIAS v2 — mesmo visual claro e roxo, com mais acabamento.
+   Tudo daqui pra baixo é novo. Para voltar ao anterior, apague este bloco.
+   ================================================================== */
+
+:root {
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --purple-grad: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+}
+
+/* CORRIGIDO: "wait" fazia parecer que estava carregando.
+   O botão "Continuar para pagamento" fica desabilitado até marcar os termos. */
+button:disabled { cursor: not-allowed; }
+
+/* ---------- Navbar: vidro fosco + sublinhado animado ---------- */
+.navbar {
+  background: rgba(252, 251, 254, .78);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+@media (min-width: 761px) {
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -7px; height: 2px; border-radius: 2px;
+    background: var(--primary); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease);
+  }
+  .nav-link:hover::after { transform: scaleX(1); }
+}
+.nav-cta { box-shadow: 0 8px 22px -10px rgba(124, 58, 237, .6); transition: background var(--t), transform var(--t), box-shadow var(--t); }
+.nav-cta:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -10px rgba(124, 58, 237, .7); }
+
+/* ---------- Hero: luz que respira + destaque roxo no título ---------- */
+.hero { position: relative; isolation: isolate; }
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(36rem 24rem at 10% 18%, #f4edff 0, transparent 62%),
+    radial-gradient(28rem 20rem at 92% 88%, #efe5fc 0, transparent 60%);
+  animation: hero-drift 16s ease-in-out infinite alternate;
+}
+@keyframes hero-drift { to { transform: translate3d(0, -20px, 0) scale(1.04); } }
+
+/* Use <em> ou <span class="accent"> dentro do título para a palavra em degradê */
+.hero-title em, .hero-title .accent, .section-heading em, .section-heading .accent {
+  font-style: normal;
+  background: linear-gradient(95deg, #7c3aed 0%, #9f5cf0 55%, #c084fc 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.hero-pill { gap: 9px; box-shadow: inset 0 0 0 1px #e2d4f7; }
+.hero-pill::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: #7c3aed; flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(124, 58, 237, .45); animation: pill-pulse 2.4s ease-out infinite;
+}
+@keyframes pill-pulse { 70% { box-shadow: 0 0 0 7px rgba(124, 58, 237, 0); } 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); } }
+
+/* ---------- Botões: brilho que passa + leve elevação ---------- */
+.btn-primary-hero, .btn-primary { position: relative; overflow: hidden; isolation: isolate; }
+.btn-primary-hero { background: var(--purple-grad); box-shadow: 0 14px 34px -14px rgba(124, 58, 237, .75); }
+.btn-primary-hero::after, .btn-primary::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .3) 50%, transparent 70%);
+  transform: translateX(-120%); transition: transform .9s var(--ease);
+}
+.btn-primary-hero:hover::after, .btn-primary:hover:not(:disabled)::after { transform: translateX(120%); }
+.btn-primary-hero:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -14px rgba(124, 58, 237, .85); }
+.btn-primary-hero:active, .btn-ghost-hero:active { transform: scale(.97); }
+.btn-ghost-hero { background: rgba(255, 255, 255, .7); transition: all var(--t); }
+.btn-ghost-hero:hover { background: #fff; border-color: #c9b1e9; transform: translateY(-2px); box-shadow: 0 12px 28px -16px rgba(70, 49, 109, .35); }
+
+/* ---------- Janela do produto: endireita no hover ---------- */
+.studio-hero { transition: transform 1s var(--ease), box-shadow 1s var(--ease); }
+@media (hover: hover) and (min-width: 1001px) {
+  .studio-hero:hover { transform: perspective(1600px) rotateY(-2deg) rotateZ(0deg) translateY(-6px); box-shadow: 0 44px 100px -36px #46316d60; }
+}
+.floating-note { background: rgba(255, 255, 255, .88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 18px 40px -12px #49346133, inset 0 0 0 1px #efe9f6; }
+.demo-prompts button { transition: background .3s, border-color .3s, transform .3s var(--ease), box-shadow .3s; }
+.demo-prompts button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -14px rgba(124, 58, 237, .5); }
+
+/* ---------- Faixa de benefícios ---------- */
+.benefit-strip > * { transition: transform .4s var(--ease); }
+.benefit-strip > *:hover { transform: translateY(-2px); }
+.benefit-strip b { background: linear-gradient(95deg, #453b52, #6d28d9); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ---------- Cards de recursos ---------- */
+.feature-card { transition: transform .5s var(--ease), box-shadow .5s var(--ease), background .5s; }
+.feature-card:hover { outline: 0; box-shadow: 0 0 0 1px #d9c6f0, 0 24px 48px -24px #713dab66; }
+.feature-icon { transition: transform .5s var(--ease), background .5s; box-shadow: 0 6px 16px -10px rgba(109, 40, 217, .4); }
+.feature-card:hover .feature-icon { transform: rotate(-6deg) scale(1.07); background: #fff; }
+.feature-card:first-child::before {
+  content: ""; position: absolute; width: 360px; height: 360px; right: -130px; bottom: -150px; border-radius: 50%;
+  background: radial-gradient(circle, #d4bdf6 0, transparent 65%); opacity: .75; pointer-events: none;
+  animation: float 9s ease-in-out infinite;
+}
+.feature-card:first-child > *, .feature-card:first-child::after { position: relative; z-index: 1; }
+
+/* ---------- Passos ---------- */
+.step-number { background: var(--purple-grad); box-shadow: 0 14px 28px -14px rgba(109, 40, 217, .8); transition: transform .5s var(--ease); }
+@media (min-width: 761px) {
+  .step-card { border-radius: 24px; transition: background .45s, transform .45s var(--ease), box-shadow .45s; }
+  .step-card:hover { background: #fff; transform: translateY(-4px); box-shadow: 0 22px 44px -26px rgba(70, 49, 109, .45); }
+  .step-card:hover .step-number { transform: rotate(-8deg) scale(1.06); }
+}
+.step-connector { color: #cdbde3; }
+
+/* ---------- Painel da extensão ---------- */
+.extension-display { transition: transform .9s var(--ease), box-shadow .9s var(--ease); }
+@media (hover: hover) and (min-width: 761px) {
+  .extension-display:hover { transform: rotate(0deg) translateY(-6px); box-shadow: 0 34px 90px -36px #44305e70; }
+}
+.visual-toggle { background: var(--purple-grad); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15); }
+.visual-toggle:after { box-shadow: 0 2px 4px rgba(0, 0, 0, .2); }
+
+/* ---------- FAQ: ícone gira e a resposta abre deslizando ---------- */
+.faq-item summary { transition: color .3s; }
+.faq-item summary:hover { color: var(--primary); }
+.faq-item summary::after {
+  content: "+"; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border-radius: 50%; background: #f1ebfa; color: #6d28d9; font-size: 20px; line-height: 1;
+  transition: transform .45s var(--ease), background .3s, color .3s;
+}
+.faq-item[open] summary::after { content: "+"; transform: rotate(45deg); background: #7c3aed; color: #fff; }
+@supports selector(::details-content) {
+  .faq-item { interpolate-size: allow-keywords; }
+  .faq-item::details-content { height: 0; overflow: clip; transition: height .5s var(--ease), content-visibility .5s allow-discrete; }
+  .faq-item[open]::details-content { height: auto; }
+}
+
+/* ---------- CTA final: degradê em movimento lento ---------- */
+.cta-section {
+  background: linear-gradient(120deg, #7840c9, #6740b2, #8b5cf6, #7840c9);
+  background-size: 260% 260%;
+  animation: cta-pan 14s ease-in-out infinite alternate;
+}
+@keyframes cta-pan { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+.cta-section:before {
+  content: ""; position: absolute; width: 420px; height: 420px; left: -160px; bottom: -220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .16), transparent 65%); pointer-events: none;
+}
+.btn-cta-white { transition: transform var(--t), box-shadow var(--t); }
+
+/* ---------- Termos e checkout ---------- */
+.terms-scroll-box {
+  scrollbar-width: thin; scrollbar-color: #c9b1e9 #f1ebfa;
+  overscroll-behavior: contain; scroll-behavior: smooth;
+  /* esmaece o fim da caixa para indicar que dá para rolar */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
+}
+.sb-link { transition: all .35s var(--ease); }
+.sb-link:hover { transform: translateX(3px); }
+.chk-row:has(.chk-input:checked) { border-color: #c9b1e9; background: #f6f0fe; }
+.chk-input:focus-visible + .chk-box { outline: 3px solid #9362e8; outline-offset: 3px; }
+.accept-card, .co-left, .co-right .summary-card, .result-card, .status-card { border-radius: 24px; }
+.plan-hero-card.active { box-shadow: 0 0 0 3px rgba(124, 58, 237, .18), 0 18px 40px -24px rgba(124, 58, 237, .6); }
+.plan-pill-btn:active, .plan-hero-card:active { transform: scale(.98); }
+.form-input:-webkit-autofill { -webkit-box-shadow: 0 0 0 1000px #fff inset; -webkit-text-fill-color: var(--text); }
+
+/* ---------- "Descer suavizado": revela ao rolar, só com CSS ----------
+   Antes o .reveal estava desligado (opacity:1). Agora os blocos sobem
+   suavemente ao entrar na tela. Navegadores sem suporte mostram tudo normal. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal, .section-heading, .section-lead, .feature-card, .step-card,
+    .outcome-grid article, .faq-item, .extension-display, .benefit-strip, .t-section {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+/* usa "translate" (e não "transform") para não brigar com as rotações e hovers dos cards */
+@keyframes reveal-up {
+  from { opacity: 0; translate: 0 32px; filter: blur(6px); }
+  to   { opacity: 1; translate: 0 0;    filter: blur(0); }
+}
