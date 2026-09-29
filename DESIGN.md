@@ -1,12 +1,23 @@
 # Design
 ## Direction
-Brief-pinned: estúdio de criação amplo e luminoso, superfícies off-white, tinta quase preta, roxo concentrado em ações. A direção fornecida prevalece sobre alternativas do sorteio da skill.
-## System
-Inter, hero 64–88px, títulos 44–60px; containers até 1440px; cards 24–32px; botões 14px. Preservar brand-mark e SVG sem alterações. Sombras difusas com deslocamento; transições 300ms; movimento reduzido respeitado.
-## Surfaces
-Landing: Persuade, hero dividido, aplicação navegável simulada, recursos assimétricos, processo, interface, benefícios, FAQ e CTA amplo.
-Admin: Operate, sidebar recolhível, busca, dados verdadeiros quando disponíveis, demonstração explícita para módulos sem backend. Falhas não viram métricas zero.
+Dark Mode SaaS / fintech: fundo escuro profundo, cards azul-marinho com borda sutil de 1px, azul elétrico/ciano como único accent (com glow suave), alto contraste. Referência: modal "Cupom de boas-vindas".
 
-## Final verification
-Inspeção em 1440, 820 e 390 pixels. Hero sem overflow; admin com tabelas que rolam dentro do próprio container. Demonstração com três prompts e transição em três etapas. Dialog nativo com foco e Escape, aria-live em status, foco visível e movimento reduzido.
-Revisão independente: visual aprovado; atualização sem registros retornados corrigida exigindo `.select('id').single()` e id correspondente. Limitação de backend explicitada em README.md.
+## System (theme.css)
+- Fundo `#070b12` / `#0b111e`; cards `#0f172a`; blocos internos `#0d1527`; secundários `#162032`.
+- Bordas `rgba(255,255,255,.08)`; destaque `rgba(56,189,248,.28)`.
+- Accent `#0084ff` / `#0099ff` / `#38bdf8`; CTA com gradiente azul e `box-shadow: 0 10px 25px -4px rgba(0,132,255,.4)`.
+- Texto `#fff` (títulos/números), `#cbd5e1`, `#94a3b8` (secundário).
+- Tipografia: Plus Jakarta Sans (UI), Outfit 800 (títulos, preços, códigos), JetBrains Mono (protocolos).
+- Raios: botões 12–14px, cards 20–24px, pílulas 9999px.
+- Componentes: `.ds-pill--solid`, `.ds-pill--outline`, `.ds-code-box` (caixa tracejada estilo cupom).
+
+## Arquivos
+- `theme.css`: tokens + componentes globais (todas as páginas).
+- `style.css`: site público (termos, checkout, pedido, status) e navbar do obrigado.html.
+- `admin.css` + `admin-redesign.css`: layout do admin (cores via tokens).
+- `admin-theme.css`: acabamento dark do admin e do editor.
+- `redesign.css`: legado da antiga landing, não é mais carregado.
+
+## Observações
+- `settings.primary_color` (Supabase) sobrescreve `--primary` no site; defina `#0084ff` em Configurações.
+- `settings.delivery_page_config` salvo antes do redesign mantém as cores antigas na página de entrega até ser redefinido/publicado de novo no Personalizador.

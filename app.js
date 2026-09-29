@@ -143,10 +143,28 @@ function initTerms() {
 /* ------------------------------------------------------------------
    CHECKOUT — PIX MANUAL
    ------------------------------------------------------------------ */
+/* Copiar para a área de transferência com fallback (funciona em http, file:// e navegadores antigos) */
+function copyText(text) {
+  const legacy = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    ta.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).catch(legacy);
+  }
+  return legacy();
+}
+
 function copyPix() {
   const input = document.getElementById('pixStr');
   const btn = document.getElementById('btnCopyPix');
-  navigator.clipboard.writeText(input.value).then(() => {
+  copyText(input.value).then(() => {
+    if (window.LUButton) { window.LUButton.success(btn, 'Copiado'); return; }
     btn.textContent = 'Copiado!';
     btn.style.background = '#059669';
     setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; }, 2000);
@@ -277,9 +295,12 @@ async function submitOrder() {
 
 function copyProto() {
   const code = document.getElementById('pendingProto').textContent;
-  navigator.clipboard.writeText(code).then(() => {
+  copyText(code).then(() => {
     const btns = document.querySelectorAll('#viewPending .btn-sm-purple');
-    btns.forEach(b => { b.textContent = 'Copiado!'; setTimeout(() => b.textContent = 'Copiar', 2000); });
+    btns.forEach(b => {
+      if (window.LUButton) { window.LUButton.success(b, 'Copiado'); return; }
+      b.textContent = 'Copiado!'; setTimeout(() => b.textContent = 'Copiar', 2000);
+    });
   });
 }
 
@@ -392,8 +413,9 @@ async function checkStatus() {
 function copyLicense() {
   const code = document.getElementById('srLicenseKey').value;
   if (!code) return;
-  navigator.clipboard.writeText(code).then(() => {
+  copyText(code).then(() => {
     const btn = document.getElementById('btnCopyLicense');
+    if (window.LUButton) { window.LUButton.success(btn, 'Copiado'); return; }
     btn.textContent = 'Copiado!';
     btn.style.background = '#059669';
     setTimeout(() => { btn.textContent = 'Copiar'; btn.style.background = ''; }, 2000);
@@ -537,6 +559,7 @@ async function applyCoupon() {
     currentCoupon = data;
     msg.textContent = `Cupom aplicado! ${data.discount}% de desconto.`;
     msg.style.color = 'var(--primary)';
+    if (window.LUButton) window.LUButton.success(document.getElementById('btnApplyCoupon'), 'Aplicado');
     
     updateCheckoutPrice();
   } catch (err) {

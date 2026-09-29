@@ -13,12 +13,12 @@ try {
 
 // Estado Padrão
 const DEFAULT_CONFIG = {
-  primaryColor: '#7c3aed',
-  bgColor: '#fcfbfe',
-  cardBgColor: '#ffffff',
-  textColor: '#1e1b29',
-  textSubColor: '#5d566b',
-  btnBgColor: '#7c3aed',
+  primaryColor: '#0084ff',
+  bgColor: '#070b12',
+  cardBgColor: '#0f172a',
+  textColor: '#ffffff',
+  textSubColor: '#94a3b8',
+  btnBgColor: '#0084ff',
   btnTextColor: '#ffffff',
   fontFamily: "'Inter', sans-serif",
   titleSize: 32,
@@ -276,15 +276,15 @@ function applyLivePreview() {
     // ESTADO: ENTREGA CONCLUÍDA
     title.textContent = c.titleDelivered;
     subtitle.textContent = c.subDelivered;
-    iconCircle.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    iconCircle.style.background = 'linear-gradient(135deg, #34d399, #059669)';
     iconCircle.innerHTML = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
     statusBadge.textContent = '✅ Entregue';
-    statusBadge.style.color = '#059669';
-    statusBadge.style.background = '#ecfdf5';
+    statusBadge.style.color = 'var(--success)';
+    statusBadge.style.background = 'var(--success-soft)';
 
-    step3.style.background = '#10b981';
+    step3.style.background = 'var(--success)';
     step3.textContent = '✓';
-    step4.style.background = '#10b981';
+    step4.style.background = 'var(--success)';
     step4.textContent = '✓';
 
     deliveryCard.style.display = c.showDeliveryCard ? 'block' : 'none';
@@ -293,17 +293,17 @@ function applyLivePreview() {
     // ESTADO: AGUARDANDO ENTREGA
     title.textContent = c.titleAwaiting;
     subtitle.textContent = c.subAwaiting;
-    iconCircle.style.background = `linear-gradient(135deg, ${c.primaryColor}, #5b21b6)`;
+    iconCircle.style.background = `linear-gradient(135deg, ${c.primaryColor}, #2f6ff0)`;
     iconCircle.innerHTML = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
     statusBadge.textContent = '● Preparando Entrega';
     statusBadge.style.color = c.primaryColor;
-    statusBadge.style.background = '#f5f3ff';
+    statusBadge.style.background = 'var(--primary-soft)';
 
     step3.style.background = c.primaryColor;
     step3.textContent = '●';
-    step4.style.background = '#ffffff';
-    step4.style.border = '2px solid #d4c5eb';
-    step4.style.color = '#8e7ea6';
+    step4.style.background = 'var(--surface-3)';
+    step4.style.border = '2px solid var(--border-strong)';
+    step4.style.color = 'var(--text-3)';
     step4.textContent = '4';
 
     deliveryCard.style.display = 'none';
@@ -312,19 +312,19 @@ function applyLivePreview() {
     // ESTADO: PAGAMENTO APROVADO
     title.textContent = c.titleAwaiting;
     subtitle.textContent = 'Pagamento identificado via PIX. Liberando fila de atendimento.';
-    iconCircle.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+    iconCircle.style.background = 'linear-gradient(135deg, #34d399, #059669)';
     iconCircle.innerHTML = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
     statusBadge.textContent = '✓ Pagamento Aprovado';
-    statusBadge.style.color = '#059669';
-    statusBadge.style.background = '#ecfdf5';
+    statusBadge.style.color = 'var(--success)';
+    statusBadge.style.background = 'var(--success-soft)';
 
-    step3.style.background = '#ffffff';
-    step3.style.border = '2px solid #d4c5eb';
-    step3.style.color = '#8e7ea6';
+    step3.style.background = 'var(--surface-3)';
+    step3.style.border = '2px solid var(--border-strong)';
+    step3.style.color = 'var(--text-3)';
     step3.textContent = '3';
-    step4.style.background = '#ffffff';
-    step4.style.border = '2px solid #d4c5eb';
-    step4.style.color = '#8e7ea6';
+    step4.style.background = 'var(--surface-3)';
+    step4.style.border = '2px solid var(--border-strong)';
+    step4.style.color = 'var(--text-3)';
     step4.textContent = '4';
 
     deliveryCard.style.display = 'none';

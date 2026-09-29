@@ -43,7 +43,7 @@ const descriptions={
   logs:'Acompanhe os acontecimentos do sistema.',
   settings:'Seu produto, do seu jeito.'
 };
-function toast(text,error=false){$('toast').textContent=text;$('toast').className='toast'+(error?' toast-error':'');$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,4500)}
+function toast(text,error=false){if(!error&&window.LUButton&&window.LUButton.fromToast(text))return;$('toast').textContent=text;$('toast').className='toast'+(error?' toast-error':'');$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,4500)}
 function isAdmin(user){return true;}
 function sampleOrders(){return []}
 function initDemoModules(){}
@@ -288,33 +288,33 @@ function subscriptions(){
   return `
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:24px;">
       <!-- Vitalício -->
-      <div style="background:#faf5ff; border:2px solid #7c3aed; border-radius:20px; padding:20px; position:relative;">
-        <span style="position:absolute; top:-10px; right:16px; background:#7c3aed; color:#fff; font-size:10px; font-weight:700; padding:2px 10px; border-radius:12px;">MAIS VENDIDO</span>
-        <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:4px;">👑 Plano Vitalício</div>
-        <div style="font-size:24px; font-weight:800; color:#1e1b29; margin-bottom:10px;">R$ 69,90 <small style="font-size:12px; color:#6b627b; font-weight:500;">pagamento único</small></div>
-        <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Acesso permanente e ilimitado à extensão LovableUnlimited.</p>
+      <div style="background:var(--primary-soft); border:2px solid var(--primary); border-radius:20px; padding:20px; position:relative;">
+        <span style="position:absolute; top:-10px; right:16px; background:var(--primary); color:#fff; font-size:10px; font-weight:700; padding:2px 10px; border-radius:12px;">MAIS VENDIDO</span>
+        <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; margin-bottom:4px;">👑 Plano Vitalício</div>
+        <div style="font-size:24px; font-weight:800; color:var(--text); margin-bottom:10px;">R$ 69,90 <small style="font-size:12px; color:var(--text-2); font-weight:500;">pagamento único</small></div>
+        <p style="font-size:13px; color:var(--text-2); margin:0; line-height:1.5;">Acesso permanente e ilimitado à extensão LovableUnlimited.</p>
       </div>
 
       <!-- Pro -->
-      <div style="background:#fff; border:1.5px solid #e4ddec; border-radius:20px; padding:20px;">
-        <div style="font-size:12px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:4px;">⚡ Plano Pro (Ilimitado)</div>
+      <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:20px; padding:20px;">
+        <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; margin-bottom:4px;">⚡ Plano Pro (Ilimitado)</div>
         <div style="display:flex; gap:8px; margin-top:8px; margin-bottom:10px;">
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 34,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 39,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 49,90</b></div>
+          <div style="flex:1; background:var(--surface-2); padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:var(--text-2);">7 Dias</small><b style="font-size:13px;">R$ 34,90</b></div>
+          <div style="flex:1; background:var(--surface-2); padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:var(--text-2);">15 Dias</small><b style="font-size:13px;">R$ 39,90</b></div>
+          <div style="flex:1; background:var(--surface-2); padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:var(--text-2);">30 Dias</small><b style="font-size:13px;">R$ 49,90</b></div>
         </div>
-        <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Uso ilimitado com prazos flexíveis.</p>
+        <p style="font-size:13px; color:var(--text-2); margin:0; line-height:1.5;">Uso ilimitado com prazos flexíveis.</p>
       </div>
 
       <!-- Basic -->
-      <div style="background:#fff; border:1.5px solid #e4ddec; border-radius:20px; padding:20px;">
-        <div style="font-size:12px; font-weight:700; color:#4b5563; text-transform:uppercase; margin-bottom:4px;">🔹 Plano Basic (Econômico)</div>
+      <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:20px; padding:20px;">
+        <div style="font-size:12px; font-weight:700; color:var(--text-2); text-transform:uppercase; margin-bottom:4px;">🔹 Plano Basic (Econômico)</div>
         <div style="display:flex; gap:8px; margin-top:8px; margin-bottom:10px;">
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">7 Dias</small><b style="font-size:13px;">R$ 19,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">15 Dias</small><b style="font-size:13px;">R$ 24,90</b></div>
-          <div style="flex:1; background:#f7f5fa; padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:#6b627b;">30 Dias</small><b style="font-size:13px;">R$ 29,90</b></div>
+          <div style="flex:1; background:var(--surface-2); padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:var(--text-2);">7 Dias</small><b style="font-size:13px;">R$ 19,90</b></div>
+          <div style="flex:1; background:var(--surface-2); padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:var(--text-2);">15 Dias</small><b style="font-size:13px;">R$ 24,90</b></div>
+          <div style="flex:1; background:var(--surface-2); padding:8px 4px; border-radius:10px; text-align:center;"><small style="display:block; font-size:10px; color:var(--text-2);">30 Dias</small><b style="font-size:13px;">R$ 29,90</b></div>
         </div>
-        <p style="font-size:13px; color:#554c69; margin:0; line-height:1.5;">Entrada acessível para testar a ferramenta.</p>
+        <p style="font-size:13px; color:var(--text-2); margin:0; line-height:1.5;">Entrada acessível para testar a ferramenta.</p>
       </div>
     </div>
 
@@ -463,17 +463,17 @@ function settingsPage() {
   if (settingCategory === 'Geral') {
     formContent = `<p>Informações usadas na página e na entrega do produto.</p><form id="settingsForm"><label>Título da página<input name="site_title" required maxlength="150" value="${esc(loadedSettings?.site_title||'LovableUnlimited — Crie mais. Interrompa menos.')}"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button>${!loadedSettings?'<p>Carregando configurações. A edição será liberada após a leitura.</p>':''}</form><hr class="t-divider" style="margin:2rem 0"><div style="text-align:center"><button type="button" class="btn-outline" style="border-color:var(--error); color:var(--error); width:100%" id="btnResetSettings">⚠️ Redefinir Tudo ao Padrão</button><p style="font-size:0.8rem; color:var(--text-3); margin-top:0.5rem;">Cuidado: Isso apagará suas cores, chave PIX e título personalizados.</p></div>`;
   } else if (settingCategory === 'Branding') {
-    formContent = `<p>Identidade visual do site.</p><form id="settingsForm"><label>Cor Primária<input type="color" name="primary_color" value="${esc(loadedSettings?.primary_color||'#7b3aed')}" style="height:46px;padding:4px;cursor:pointer;"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button></form>`;
+    formContent = `<p>Identidade visual do site.</p><form id="settingsForm"><label>Cor Primária<input type="color" name="primary_color" value="${esc(loadedSettings?.primary_color||'#0084ff')}" style="height:46px;padding:4px;cursor:pointer;"></label><button class="btn-primary" ${!loadedSettings?'disabled':''}>Salvar configurações</button></form>`;
   } else if (settingCategory === 'Página de entrega') {
     formContent = `
       <p>Personalize visualmente a página que o cliente vê durante a confirmação e a entrega do pedido.</p>
       
-      <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(168, 85, 247, 0.04) 100%); border: 1.5px solid #c4b5fd; border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+      <div style="background: linear-gradient(135deg, rgba(0,132,255, 0.08) 0%, rgba(56,189,248, 0.04) 100%); border: 1.5px solid var(--primary-border); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap;">
           <div style="max-width:540px;">
             <span class="badge purple" style="margin-bottom:10px;">✨ Editor Visual Personalizado</span>
-            <h3 style="font-size:18px; font-weight:700; color:#1e1b29; margin-bottom:8px;">Personalizador da Página de Entrega</h3>
-            <p style="font-size:13.5px; color:#554c69; line-height:1.6; margin-bottom:16px;">
+            <h3 style="font-size:18px; font-weight:700; color:var(--text); margin-bottom:8px;">Personalizador da Página de Entrega</h3>
+            <p style="font-size:13.5px; color:var(--text-2); line-height:1.6; margin-bottom:16px;">
               Abra nosso editor visual com preview em tempo real (Desktop, Tablet e Mobile). Edite cores, fontes, títulos, textos de espera e ative/desative animações de confete e timeline sem quebrar o layout.
             </p>
             <div style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -486,14 +486,14 @@ function settingsPage() {
               </a>
             </div>
           </div>
-          <div style="background:#fff; border-radius:12px; padding:16px; border:1px solid #e4ddec; min-width:220px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+          <div style="background:var(--surface); border-radius:12px; padding:16px; border:1px solid var(--border); min-width:220px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
             <div style="font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; margin-bottom:8px;">Status da Configuração</div>
             <div style="margin-bottom:8px; font-size:13px; display:flex; align-items:center; gap:8px;">
-              <span style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+              <span style="width:8px; height:8px; border-radius:50%; background:var(--success);"></span>
               <b>Publicado:</b> ${loadedSettings?.delivery_page_config ? 'Personalizado' : 'Padrão do Sistema'}
             </div>
             <div style="font-size:13px; display:flex; align-items:center; gap:8px;">
-              <span style="width:8px; height:8px; border-radius:50%; background:${loadedSettings?.delivery_page_draft ? '#f59e0b' : '#94a3b8'};"></span>
+              <span style="width:8px; height:8px; border-radius:50%; background:${loadedSettings?.delivery_page_draft ? 'var(--warning)' : 'var(--text-3)'};"></span>
               <b>Rascunho:</b> ${loadedSettings?.delivery_page_draft ? 'Existe rascunho' : 'Nenhum'}
             </div>
           </div>
@@ -507,12 +507,12 @@ function settingsPage() {
     formContent = `
       <p>Envie o arquivo que o cliente receberá para download após a aprovação da compra.</p>
       
-      <div style="background: #faf8fd; border: 2px dashed #c4b5fd; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
-        <div style="width: 52px; height: 52px; border-radius: 50%; background: #ede5fa; color: #7c3aed; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+      <div style="background: var(--surface); border: 2px dashed var(--primary-border); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
-        <h3 style="font-size: 16px; font-weight: 600; color: #1e1b29; margin-bottom: 6px;">Enviar Novo Arquivo da Extensão</h3>
-        <p style="font-size: 13px; color: #6b627b; margin-bottom: 16px; max-width: 440px; margin-left: auto; margin-right: auto;">
+        <h3 style="font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px;">Enviar Novo Arquivo da Extensão</h3>
+        <p style="font-size: 13px; color: var(--text-2); margin-bottom: 16px; max-width: 440px; margin-left: auto; margin-right: auto;">
           Escolha o arquivo no seu computador (.zip, .crx, .rar, etc.). Ele será salvo no armazenamento e entregue aos clientes.
         </p>
         <input type="file" id="extFileInput" accept=".zip,.crx,.rar,.7z,.tar,.gz,.json" style="display: none;">
@@ -523,10 +523,10 @@ function settingsPage() {
         <div id="uploadFeedback" style="margin-top: 14px; font-size: 13px; font-weight: 600; display: none;"></div>
       </div>
 
-      <div style="background: #f7f5fa; border-radius: 14px; padding: 16px 20px; margin-bottom: 24px;">
-        <div style="font-size: 12px; font-weight: 600; color: #7c3aed; text-transform: uppercase; margin-bottom: 6px;">Arquivo de Entrega Ativo</div>
+      <div style="background: var(--surface-2); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px;">
+        <div style="font-size: 12px; font-weight: 600; color: var(--primary); text-transform: uppercase; margin-bottom: 6px;">Arquivo de Entrega Ativo</div>
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
-          <code style="word-break: break-all; font-size: 13px; background: #fff; padding: 8px 12px; border-radius: 8px; border: 1px solid #e4ddec; flex: 1;">${esc(curUrl)}</code>
+          <code style="word-break: break-all; font-size: 13px; background: var(--surface); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); flex: 1;">${esc(curUrl)}</code>
           <a href="${esc(curUrl)}" target="_blank" download class="btn-outline" style="font-size: 13px; padding: 8px 14px; text-decoration: none; flex-shrink: 0;">
             ⬇️ Testar Download
           </a>
@@ -835,16 +835,16 @@ function openDeliveryModal(id) {
     </div>
 
     ${isDelivered ? `
-      <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:14px; padding:18px; margin-bottom:20px;">
-        <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; margin-bottom:10px;">
+      <div style="background:var(--primary-soft); border:1px solid var(--primary-border); border-radius:14px; padding:18px; margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; margin-bottom:10px;">
           🎉 Chave de Acesso Ilimitado Ativa
         </div>
         <p style="margin-bottom:10px;">
           🔑 <b>Chave Entregue:</b> 
-          <code style="background:#fff; padding:6px 12px; border-radius:8px; font-weight:700; border:1px solid #c4b5fd; font-size:14px; display:inline-block; margin-top:4px;">${esc((o.license_key && o.license_key !== 'undefined') ? o.license_key : ((parsedPayload.key && parsedPayload.key !== 'undefined') ? parsedPayload.key : 'Chave Oficial Ilimitada'))}</code>
+          <code style="background:var(--surface); padding:6px 12px; border-radius:8px; font-weight:700; border:1px solid var(--primary-border); font-size:14px; display:inline-block; margin-top:4px;">${esc((o.license_key && o.license_key !== 'undefined') ? o.license_key : ((parsedPayload.key && parsedPayload.key !== 'undefined') ? parsedPayload.key : 'Chave Oficial Ilimitada'))}</code>
         </p>
         ${parsedPayload.message ? `<p style="margin-bottom:8px; font-size:13px;">💬 <b>Instruções:</b> ${esc(parsedPayload.message)}</p>` : ''}
-        <div style="font-size:12px; color:var(--text-3); margin-top:12px; border-top:1px dashed #c4b5fd; padding-top:8px;">
+        <div style="font-size:12px; color:var(--text-3); margin-top:12px; border-top:1px dashed var(--primary-border); padding-top:8px;">
           Entregue em: <b>${date(o.delivered_at)}</b> por <b>${esc(o.delivered_by || 'Admin')}</b>
         </div>
       </div>
@@ -855,18 +855,18 @@ function openDeliveryModal(id) {
       </div>
     ` : `
       <!-- Status do Plano Revendedor Oficial -->
-      <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%); border: 1.5px solid #c4b5fd; border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="background: linear-gradient(135deg, rgba(0,132,255, 0.08) 0%, rgba(16, 185, 129, 0.06) 100%); border: 1.5px solid var(--primary-border); border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="font-size:22px;">👑</span>
           <div>
-            <div style="font-size:11px; font-weight:700; color:#7c3aed; text-transform:uppercase; letter-spacing:0.04em;">Acesso Revendedor Oficial</div>
-            <div style="font-size:13px; font-weight:700; color:#1e1b29;">Licenças Ilimitadas & Gratuitas</div>
+            <div style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.04em;">Acesso Revendedor Oficial</div>
+            <div style="font-size:13px; font-weight:700; color:var(--text);">Licenças Ilimitadas & Gratuitas</div>
           </div>
         </div>
         <span class="badge ok" style="font-size:11px; font-weight:700;">Revendedor Ativo</span>
       </div>
 
-      <div id="modalApiErrorBox" style="display:none; background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:10px 14px; border-radius:10px; font-size:12.5px; margin-bottom:14px; line-height:1.5;"></div>
+      <div id="modalApiErrorBox" style="display:none; background:var(--error-soft); border:1px solid var(--error-border); color:var(--error); padding:10px 14px; border-radius:10px; font-size:12.5px; margin-bottom:14px; line-height:1.5;"></div>
 
       <form id="deliveryForm">
         <div style="margin-bottom:16px;">
@@ -876,7 +876,7 @@ function openDeliveryModal(id) {
             <button type="button" class="btn-outline" id="btnGenRandomKey" style="font-size:12px; white-space:nowrap;" title="Gera um código local">Gerar Código Rápido</button>
           </div>
           
-          <button type="button" class="btn-primary" id="btnGenerateViaApi" style="width:100%; font-size:13px; padding:10px 16px; background:#7c3aed; border-color:#7c3aed; gap:8px; margin-top:4px;">
+          <button type="button" class="btn-primary" id="btnGenerateViaApi" style="width:100%; font-size:13px; padding:10px 16px; background:var(--primary); border-color:var(--primary); gap:8px; margin-top:4px;">
             ⚡ Gerar Chave Oficial na API Lovable (${isLifetime ? 'Vitalício' : '30 Dias'})
           </button>
           <small style="color:var(--text-3); font-size:11.5px; margin-top:6px; display:block;">
@@ -1193,7 +1193,7 @@ function bindContent(){
     if(!confirm('Tem certeza que deseja apagar todas as configurações personalizadas e voltar ao padrão?'))return;
     const btn=$('btnResetSettings');
     btn.disabled=true;
-    const defaults={site_title:'LovableUnlimited — Crie mais. Interrompa menos.',download_url:'lovableunlimited.zip',primary_color:'#7b3aed',pix_key:'',product_price:97};
+    const defaults={site_title:'LovableUnlimited — Crie mais. Interrompa menos.',download_url:'lovableunlimited.zip',primary_color:'#0084ff',pix_key:'',product_price:97};
     try{
       if(!authorized||!client||!loadedSettings?.id)throw new Error('Sem conexão.');
       const {error}=await client.from('settings').update(defaults).eq('id',loadedSettings.id);
@@ -1212,7 +1212,7 @@ function bindContent(){
     if(!file)return;
     const feedback=$('uploadFeedback');
     feedback.style.display='block';
-    feedback.style.color='#7c3aed';
+    feedback.style.color='var(--primary)';
     feedback.textContent=`Enviando "${file.name}" (${(file.size/(1024*1024)).toFixed(2)} MB)... Aguarde.`;
     const btnSelect=$('btnSelectFile');
     btnSelect.disabled=true;
@@ -1244,12 +1244,12 @@ function bindContent(){
         if(updErr)throw updErr;
       }
       loadedSettings={...loadedSettings,download_url:publicUrl};
-      feedback.style.color='#059669';
+      feedback.style.color='var(--success)';
       feedback.textContent=`✅ Arquivo "${file.name}" enviado com sucesso! Seus clientes já receberão este novo arquivo para download.`;
       toast('Novo arquivo salvo e configurado para entrega!');
       setTimeout(()=>render(),2000);
     }catch(err){
-      feedback.style.color='#dc2626';
+      feedback.style.color='var(--error)';
       feedback.textContent=`❌ ${err.message}`;
       toast('Não foi possível enviar: '+err.message,true);
     }finally{

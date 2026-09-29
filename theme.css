@@ -1,0 +1,431 @@
+/* ==================================================================
+   LOVABLEUNLIMITED — DESIGN SYSTEM (DARK · NEON BLUE)
+   Fonte única de verdade para cores, tipografia, raios e sombras.
+   Carregue este arquivo ANTES das folhas de cada página
+   (style.css / admin.css / admin-redesign.css).
+   ================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ---------- Superfícies ---------- */
+  --bg: #070b12;              /* fundo da página */
+  --bg-2: #0b111e;            /* fundo alternativo / inputs */
+  --surface: #0f172a;         /* cards, containers, seções */
+  --surface-2: #0d1527;       /* blocos internos (inset) */
+  --surface-3: #162032;       /* botões secundários, hover */
+  --surface-glass: rgba(15, 23, 42, .78);
+  --input-bg: #0b111e;
+
+  /* ---------- Bordas ---------- */
+  --border: rgba(255, 255, 255, .08);
+  --border-light: rgba(255, 255, 255, .05);
+  --border-strong: rgba(255, 255, 255, .14);
+  --border-accent: rgba(56, 189, 248, .12);
+
+  /* ---------- Marca / Accent ---------- */
+  --primary: #0084ff;
+  --primary-hover: #0099ff;
+  --primary-active: #0070d9;
+  --accent: #38bdf8;
+  --accent-strong: #0099ff;
+  --primary-soft: rgba(0, 132, 255, .12);
+  --primary-border: rgba(56, 189, 248, .28);
+  --primary-glow: rgba(0, 132, 255, .4);
+  --grad-primary: linear-gradient(100deg, #0ea5ff 0%, #0084ff 50%, #2f6ff0 100%);
+  --grad-text: linear-gradient(100deg, #ffffff 0%, #bfe6ff 60%, #38bdf8 100%);
+
+  /* ---------- Texto ---------- */
+  --text: #ffffff;
+  --text-2: #cbd5e1;
+  --text-3: #94a3b8;
+  --text-4: #64748b;
+
+  /* ---------- Status ---------- */
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, .10);
+  --success-border: rgba(52, 211, 153, .28);
+  --error: #f87171;
+  --error-soft: rgba(248, 113, 113, .10);
+  --error-border: rgba(248, 113, 113, .30);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, .10);
+  --warning-border: rgba(251, 191, 36, .28);
+  --blue: var(--accent);
+  --blue-soft: var(--primary-soft);
+  --blue-border: var(--primary-border);
+
+  /* ---------- Tipografia ---------- */
+  --font: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ---------- Raios ---------- */
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* ---------- Sombras ---------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, .6), 0 0 0 1px var(--border);
+  --shadow-lg: 0 30px 70px -20px rgba(0, 0, 0, .75), 0 0 0 1px var(--border);
+  --shadow-glow: 0 10px 25px -4px rgba(0, 132, 255, .4);
+  --shadow-glow-lg: 0 16px 36px -6px rgba(0, 132, 255, .55);
+
+  /* ---------- Movimento ---------- */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --ease-soft: var(--ease);
+  --t: 220ms var(--ease);
+
+  /* ---------- Aliases legados (usados em HTML/JS existentes) ---------- */
+  --text-1: var(--text);
+  --bg-1: var(--input-bg);
+  --border-color: var(--border-strong);
+  --surface-alt: var(--surface-2);
+  --purple-grad: var(--grad-primary);
+  --ok: var(--success);
+}
+
+/* ==================================================================
+   BASE
+   ================================================================== */
+html { background: var(--bg); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  position: relative;
+  isolation: isolate;
+}
+/* Iluminação ambiente (glow) fixa atrás do conteúdo */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60rem 36rem at 85% -10%, rgba(0, 132, 255, .10), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 110%, rgba(56, 189, 248, .06), transparent 60%);
+}
+h1, h2, h3, h4 { color: var(--text); letter-spacing: -.025em; }
+::selection { background: rgba(0, 132, 255, .35); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+a { color: var(--accent); }
+code, kbd {
+  font-family: var(--mono);
+  background: var(--surface-3);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+/* Scrollbar */
+* { scrollbar-width: thin; scrollbar-color: #1e2a40 transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e2a40; border-radius: 99px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: #2a3a57; }
+
+/* ==================================================================
+   BOTÕES
+   ================================================================== */
+.btn-primary,
+.btn-sm-purple,
+.btn-main-cta,
+.btn-copy {
+  background: var(--grad-primary);
+  color: #fff;
+  border: 0;
+  font-weight: 700;
+  box-shadow: var(--shadow-glow);
+  transition: transform var(--t), box-shadow var(--t), filter var(--t);
+}
+.btn-primary { border-radius: 14px; }
+.btn-primary:hover:not(:disabled),
+.btn-sm-purple:hover,
+.btn-main-cta:hover,
+.btn-copy:hover {
+  background: var(--grad-primary);
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-lg);
+}
+.btn-primary:active:not(:disabled),
+.btn-sm-purple:active,
+.btn-main-cta:active,
+.btn-copy:active { transform: translateY(0) scale(.98); filter: brightness(.96); }
+.btn-primary:disabled {
+  background: var(--surface-3);
+  color: var(--text-4);
+  box-shadow: none;
+  opacity: 1;
+  filter: none;
+  border: 1px solid var(--border);
+}
+
+.btn-outline,
+.btn-secondary,
+.btn-sm-outline {
+  background: var(--surface-3);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background var(--t), border-color var(--t), color var(--t), transform var(--t);
+}
+.btn-outline:hover,
+.btn-secondary:hover,
+.btn-sm-outline:hover {
+  background: #1b2740;
+  border-color: var(--primary-border);
+  color: #fff;
+}
+
+/* ==================================================================
+   PÍLULAS / BADGES (utilitários do design system)
+   ================================================================== */
+.ds-pill {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .32rem .8rem;
+  border-radius: var(--radius-pill);
+  font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  line-height: 1.2; white-space: nowrap;
+}
+.ds-pill--solid { background: #0e8ff0; color: #fff; box-shadow: 0 6px 18px -6px var(--primary-glow); }
+.ds-pill--outline { background: rgba(56, 189, 248, .06); color: var(--accent); border: 1px solid var(--primary-border); }
+
+/* ==================================================================
+   CAMPOS
+   ================================================================== */
+.form-input,
+input[type="text"], input[type="email"], input[type="password"], input[type="search"],
+input[type="number"], input[type="url"], input[type="tel"], input[type="date"],
+textarea, select {
+  background-color: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color var(--t), box-shadow var(--t), background-color var(--t);
+}
+.form-input::placeholder, input::placeholder, textarea::placeholder { color: var(--text-4); }
+.form-input:hover:not(:focus):not(:disabled) { border-color: var(--border-strong); }
+.form-input:focus,
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, .18), 0 0 18px -4px rgba(56, 189, 248, .45);
+  background-color: var(--input-bg);
+  outline: none;
+}
+input:-webkit-autofill, .form-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--text);
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--primary); }
+
+/* ------------------------------------------------------------------
+   CHECKBOX COM ✓ ANIMADO (todas as páginas, inclusive o painel)
+   O ✓ "se desenha" ao marcar e "se apaga" ao desmarcar.
+   ------------------------------------------------------------------ */
+input[type="checkbox"]:not(.chk-input) {
+  -webkit-appearance: none; appearance: none;
+  position: relative; flex-shrink: 0; margin: 0; cursor: pointer; vertical-align: middle;
+  width: 20px !important; height: 20px !important;
+  border-radius: 6px;
+  background: var(--surface-3);
+  border: 1.5px solid var(--border-strong);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35);
+  transition: background-color .25s ease, border-color .25s ease, box-shadow .3s ease, transform .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+input[type="checkbox"]:not(.chk-input)::before {
+  content: ""; position: absolute; inset: 1px;
+  background: #fff;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23000' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path .28s cubic-bezier(.65, 0, .35, 1);
+}
+input[type="checkbox"]:not(.chk-input)::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 2.5px; border-radius: 2px;
+  background: #fff; transform: translate(-50%, -50%) scaleX(0);
+  transition: transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+input[type="checkbox"]:not(.chk-input):hover { border-color: var(--primary-border); background: #1b2740; }
+input[type="checkbox"]:not(.chk-input):checked,
+input[type="checkbox"]:not(.chk-input):indeterminate {
+  background: var(--grad-primary);
+  border-color: transparent;
+  box-shadow: 0 4px 12px -4px rgba(0, 132, 255, .75), 0 0 0 3px rgba(0, 132, 255, .15);
+  animation: chk-pop .4s cubic-bezier(.34, 1.56, .64, 1);
+}
+input[type="checkbox"]:not(.chk-input):checked::before {
+  clip-path: inset(0 0 0 0);
+  animation: chk-draw .42s cubic-bezier(.22, 1, .36, 1) .05s both;
+}
+@keyframes chk-draw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+input[type="checkbox"]:not(.chk-input):indeterminate::before { clip-path: inset(0 100% 0 0); }
+input[type="checkbox"]:not(.chk-input):indeterminate::after { transform: translate(-50%, -50%) scaleX(1); }
+input[type="checkbox"]:not(.chk-input):active { transform: scale(.9); }
+input[type="checkbox"]:not(.chk-input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input[type="checkbox"]:not(.chk-input):disabled { opacity: .45; cursor: not-allowed; }
+@keyframes chk-pop { 0% { transform: scale(.8); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+/* Radio no mesmo estilo */
+input[type="radio"] {
+  -webkit-appearance: none; appearance: none; position: relative; margin: 0; cursor: pointer; flex-shrink: 0;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--surface-3); border: 1.5px solid var(--border-strong);
+  transition: border-color .25s ease, box-shadow .3s ease;
+}
+input[type="radio"]::before {
+  content: ""; position: absolute; inset: 4px; border-radius: 50%;
+  background: var(--grad-primary); transform: scale(0);
+  transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
+}
+input[type="radio"]:checked { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 132, 255, .15); }
+input[type="radio"]:checked::before { transform: scale(1); }
+select option { background: var(--surface); color: var(--text); }
+
+/* ==================================================================
+   CAIXA DE DESTAQUE (estilo "caixa de cupom")
+   ================================================================== */
+.ds-code-box {
+  background: linear-gradient(180deg, rgba(56, 189, 248, .04), rgba(56, 189, 248, .015)), var(--bg-2);
+  border: 1px dashed rgba(56, 189, 248, .35);
+  border-radius: var(--radius-md);
+}
+
+/* ==================================================================
+   DIALOG / MODAL
+   ================================================================== */
+dialog {
+  background: var(--surface);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg), 0 0 60px -20px rgba(0, 132, 255, .35);
+}
+dialog::backdrop { background: rgba(3, 6, 12, .72); backdrop-filter: blur(6px); }
+
+/* ==================================================================
+   MOTION (motion.js)
+   ================================================================== */
+/* O scroll suave é feito por JS; o CSS não pode suavizar por cima */
+html.motion-ready { scroll-behavior: auto; }
+
+/* Barra de progresso de rolagem */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 9999;
+  transform-origin: 0 50%; transform: scaleX(0);
+  background: linear-gradient(90deg, #38bdf8, #0084ff 60%, #2f6ff0);
+  box-shadow: 0 0 12px rgba(56, 189, 248, .8), 0 0 2px rgba(56, 189, 248, 1);
+  opacity: 0; transition: opacity .3s ease; pointer-events: none;
+}
+.scroll-progress.is-visible { opacity: 1; }
+
+/* Revelação ao rolar */
+html.motion-ready .rv {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0) scale(.985);
+  transition:
+    opacity .8s cubic-bezier(.22, 1, .36, 1) var(--rv-delay, 0ms),
+    transform .9s cubic-bezier(.22, 1, .36, 1) var(--rv-delay, 0ms);
+  will-change: opacity, transform;
+}
+html.motion-ready .rv.rv-in { opacity: 1; transform: none; }
+
+/* Brilho que segue o cursor */
+.spot-rel { position: relative; }
+.spot::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(56, 189, 248, .075), transparent 45%);
+  opacity: 0; transition: opacity .35s ease;
+}
+.spot.spot-on::after { opacity: 1; }
+.spot.spot-on { border-color: rgba(56, 189, 248, .22); }
+
+/* Fundo: grade técnica sutil + aurora em movimento lento */
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 20%, transparent 75%);
+          mask-image: radial-gradient(ellipse 70% 55% at 50% 0%, #000 20%, transparent 75%);
+}
+body::before { animation: aurora 24s ease-in-out infinite alternate; }
+@keyframes aurora {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-3%, 2%, 0) scale(1.06); }
+  100% { transform: translate3d(2%, -2%, 0) scale(1.03); }
+}
+
+/* ==================================================================
+   FEEDBACK DENTRO DO BOTÃO (LUButton.success)
+   ================================================================== */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.fx-host { overflow: hidden; isolation: isolate; }
+.fx-rel { position: relative; }
+.fx-host > :not(.btn-fx) { transition: opacity .25s ease, transform .45s cubic-bezier(.22, 1, .36, 1); }
+.fx-host { transition: color .2s ease, box-shadow .4s ease, transform .3s ease, filter .3s ease; }
+.fx-host.is-success { color: transparent !important; }
+.fx-host.is-success > :not(.btn-fx) { opacity: 0; transform: translateY(-14px); }
+.fx-host.is-leaving > :not(.btn-fx) { animation: fx-back .5s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes fx-back { from { opacity: 0; transform: translateY(14px); } }
+
+.btn-fx {
+  position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  font-weight: 800; letter-spacing: .01em; white-space: nowrap;
+  color: #fff;
+  background: linear-gradient(100deg, #0ea5ff 0%, #10b981 100%);
+  opacity: 0; transform: translateY(105%);
+}
+.is-success > .btn-fx { opacity: 1; transform: none; transition: transform .5s cubic-bezier(.22, 1, .36, 1), opacity .2s ease; }
+.is-leaving > .btn-fx { opacity: 0; transform: translateY(-105%); transition: transform .5s cubic-bezier(.22, 1, .36, 1), opacity .35s ease .1s; }
+.btn-fx { padding: 0 10px; overflow: hidden; }
+.btn-fx.fx-compact .btn-fx-text { display: none; }
+.btn-fx.fx-compact .btn-fx-check { width: 20px; height: 20px; }
+.btn-fx-text { white-space: nowrap; min-width: 0; overflow: hidden; }
+/* Segurança extra: mesmo sem JS atualizado, o ✓ nunca é cortado */
+.btn-fx-check { flex: 0 0 auto; }
+.btn-fx-check { flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(255, 255, 255, .55)); }
+.btn-fx-check path { stroke-dasharray: 24; stroke-dashoffset: 24; }
+.is-success .btn-fx-check { animation: fx-pop .5s cubic-bezier(.34, 1.56, .64, 1) .12s both; }
+.is-success .btn-fx-check path { animation: fx-draw .45s cubic-bezier(.22, 1, .36, 1) .18s forwards; }
+.btn-fx-text { opacity: 0; transform: translateX(-6px); }
+.is-success .btn-fx-text { animation: fx-text .4s cubic-bezier(.22, 1, .36, 1) .28s forwards; }
+@keyframes fx-draw { to { stroke-dashoffset: 0; } }
+@keyframes fx-pop { from { transform: scale(.3) rotate(-20deg); } }
+@keyframes fx-text { to { opacity: 1; transform: none; } }
+.fx-host.is-success { box-shadow: 0 0 0 4px rgba(16, 185, 129, .18), 0 14px 30px -8px rgba(16, 185, 129, .45) !important; }
+
+/* Botões secundários/contorno: painel sutil em vez de sólido */
+.btn-outline > .btn-fx, .btn-secondary > .btn-fx, .btn-sm-outline > .btn-fx, .btn-ghost-link > .btn-fx, .row-action > .btn-fx, .text-button > .btn-fx {
+  background: rgba(16, 185, 129, .14); color: var(--success);
+  box-shadow: inset 0 0 0 1px var(--success-border);
+}
+
+/* ==================================================================
+   DIALOG — entrada e saída suaves
+   ================================================================== */
+dialog[open] { animation: dlg-in .42s cubic-bezier(.22, 1, .36, 1); }
+dialog[open]::backdrop { animation: bd-in .35s ease; }
+dialog.is-closing { animation: dlg-out .22s ease forwards; }
+dialog.is-closing::backdrop { animation: bd-out .22s ease forwards; }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(16px) scale(.97); } }
+@keyframes dlg-out { to { opacity: 0; transform: translateY(10px) scale(.98); } }
+@keyframes bd-in { from { opacity: 0; } }
+@keyframes bd-out { to { opacity: 0; } }
+
+/* Toast (apenas erros e avisos sem botão de origem) */
+.toast:not([hidden]) { animation: toast-in .45s cubic-bezier(.22, 1, .36, 1); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+
+/* ==================================================================
+   MOVIMENTO REDUZIDO
+   ================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
