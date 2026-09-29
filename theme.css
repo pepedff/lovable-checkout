@@ -315,13 +315,17 @@ html.motion-ready { scroll-behavior: auto; }
 
 /* Barra de progresso de rolagem */
 .scroll-progress {
-  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 9999;
+  /* o brilho fica no contêiner (sem escala) para não virar uma mancha no canto */
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 9999; pointer-events: none;
+  opacity: 0; transition: opacity .25s ease;
+  filter: drop-shadow(0 0 5px rgba(56, 189, 248, .75));
+}
+.scroll-progress-fill {
+  height: 100%; width: 100%;
   transform-origin: 0 50%; transform: scaleX(0);
   background: linear-gradient(90deg, #38bdf8, #0084ff 60%, #2f6ff0);
-  box-shadow: 0 0 12px rgba(56, 189, 248, .8), 0 0 2px rgba(56, 189, 248, 1);
-  opacity: 0; transition: opacity .3s ease; pointer-events: none;
+  border-radius: 0 2px 2px 0;
 }
-.scroll-progress.is-visible { opacity: 1; }
 
 /* Revelação ao rolar */
 html.motion-ready .rv {

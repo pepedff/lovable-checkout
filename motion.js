@@ -104,14 +104,19 @@
   const bar = document.createElement('div');
   bar.className = 'scroll-progress';
   bar.setAttribute('aria-hidden', 'true');
+  const fill = document.createElement('div');
+  fill.className = 'scroll-progress-fill';
+  bar.appendChild(fill);
   document.body.appendChild(bar);
   let barRaf = 0;
   function updateBar() {
     barRaf = 0;
     const max = root.scrollHeight - window.innerHeight;
     const p = max > 8 ? window.scrollY / max : 0;
-    bar.style.transform = `scaleX(${clamp(p, 0, 1)})`;
-    bar.classList.toggle('is-visible', max > 8 && window.scrollY > 4);
+    const k = clamp(p, 0, 1);
+    fill.style.transform = `scaleX(${k})`;
+    // some suavemente perto do topo (sem "bolha" de brilho no canto)
+    bar.style.opacity = max > 8 ? String(clamp(k * 30, 0, 1)) : '0';
     root.classList.toggle('is-scrolled', window.scrollY > 12);
   }
   const queueBar = () => { if (!barRaf) barRaf = requestAnimationFrame(updateBar); };
