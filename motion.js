@@ -222,6 +222,7 @@
     let spyRaf = 0;
     const spy = () => {
       spyRaf = 0;
+      if (!box.offsetParent) return; // tela dos termos ainda escondida
       const top = box.getBoundingClientRect().top + 60;
       let cur = sections[0];
       sections.forEach((s) => { if (s.getBoundingClientRect().top <= top) cur = s; });
@@ -233,6 +234,9 @@
     box.addEventListener('scroll', queueSpy, { passive: true });
     // roda depois do scrollspy antigo (app.js) para prevalecer
     window.addEventListener('scroll', queueSpy, { passive: true });
+    const termsView = document.getElementById('viewTerms');
+    if (termsView) new MutationObserver(queueSpy).observe(termsView, { attributes: true, attributeFilter: ['style', 'class'] });
+    window.addEventListener('load', queueSpy);
     spy();
   }
 
@@ -279,6 +283,7 @@
 
   function shortLabel(msg) {
     const m = String(msg || '').toLowerCase();
+    if (/chave|licen/.test(m) && /gerad|criad/.test(m)) return 'Chave gerada';
     if (/copi/.test(m)) return 'Copiado';
     if (/salv|atualiz|publica/.test(m)) return 'Salvo';
     if (/aprov|confirm/.test(m)) return 'Confirmado';
@@ -308,6 +313,15 @@
       const txt = fx.querySelector('.btn-fx-text');
       const need = 18 + 8 + txt.scrollWidth + 20;
       if (need > btn.clientWidth) fx.classList.add('fx-compact');
+      btn._fx = fx;
+      // Se o código trocar o texto do botão durante a animação, o painel ✓ é mantido
+      if (!btn._fxObs) {
+        btn._fxObs = new MutationObserver(() => {
+          const active = btn.classList.contains('is-success') || btn.classList.contains('is-leaving');
+          if (active && btn._fx && !btn._fx.isConnected) btn.appendChild(btn._fx);
+        });
+        btn._fxObs.observe(btn, { childList: true });
+      }
       clearTimeout(btn._fxT1); clearTimeout(btn._fxT2);
       btn.classList.add('fx-host');
       if (getComputedStyle(btn).position === 'static') btn.classList.add('fx-rel');
@@ -378,30 +392,40 @@
   /* ------------------------------------------------------------
      9) ADMIN: indicador deslizante no menu + troca suave de página
      ------------------------------------------------------------ */
-  const nav = document.getElementById('adminNav');
-  if (nav) {
-    nav.classList.add('has-indicator');
+  function slidingIndicator(navEl, activeSel, extraTargets = []) {
+    navEl.classList.add('has-indicator');
     const ind = document.createElement('span');
     ind.className = 'nav-indicator';
     ind.setAttribute('aria-hidden', 'true');
     let placed = false;
     const place = () => {
-      if (!ind.isConnected) nav.prepend(ind);
-      const a = nav.querySelector('.menu-item.active');
+      if (!ind.isConnected) navEl.prepend(ind);
+      const a = navEl.querySelector(activeSel);
       if (!a || !a.offsetParent) { ind.style.opacity = '0'; return; }
-      if (!placed) { ind.style.transition = 'none'; }
+      if (!placed) ind.style.transition = 'none';
       ind.style.opacity = '1';
-      ind.style.transform = `translateY(${a.offsetTop}px)`;
+      ind.style.width = `${a.offsetWidth}px`;
       ind.style.height = `${a.offsetHeight}px`;
+      ind.style.transform = `translate(${a.offsetLeft}px, ${a.offsetTop}px)`;
       if (!placed) { void ind.offsetWidth; ind.style.transition = ''; placed = true; }
     };
-    nav.prepend(ind);
-    new MutationObserver(place).observe(nav, { attributes: true, subtree: true, attributeFilter: ['class'] });
-    new ResizeObserver(place).observe(nav);
+    navEl.prepend(ind);
+    new MutationObserver(place).observe(navEl, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    new ResizeObserver(place).observe(navEl);
     window.addEventListener('resize', place);
-    const panel = document.getElementById('adminPanel');
-    if (panel) new MutationObserver(() => requestAnimationFrame(place)).observe(panel, { attributes: true, attributeFilter: ['class', 'hidden'] });
+    extraTargets.forEach((el) => el && new MutationObserver(() => requestAnimationFrame(place))
+      .observe(el, { attributes: true, attributeFilter: ['class', 'hidden', 'style'] }));
     place();
+    return place;
+  }
+
+  // Menu lateral dos termos (página pública)
+  const termsNav = document.getElementById('sidebarNav');
+  if (termsNav) slidingIndicator(termsNav, '.sb-link.active', [document.getElementById('viewTerms')]);
+
+  const nav = document.getElementById('adminNav');
+  if (nav) {
+    slidingIndicator(nav, '.menu-item.active', [document.getElementById('adminPanel')]);
 
     // Título da página troca com fade
     const title = document.getElementById('adminPageTitle');

@@ -424,6 +424,24 @@ dialog.is-closing::backdrop { animation: bd-out .22s ease forwards; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }
 
 /* ==================================================================
+   INDICADOR DESLIZANTE DE MENUS (admin e termos)
+   ================================================================== */
+.has-indicator > .nav-indicator {
+  position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(0,132,255,.20), rgba(0,132,255,.06));
+  border: 1px solid var(--primary-border);
+  box-shadow: inset 3px 0 0 var(--accent), 0 10px 26px -14px rgba(0,132,255,.8);
+  opacity: 0;
+  transition: transform .55s cubic-bezier(.22, 1, .36, 1), height .35s ease, width .35s ease, opacity .3s ease;
+  will-change: transform;
+}
+.has-indicator > :not(.nav-indicator) { position: relative; z-index: 1; }
+.sidebar-nav.has-indicator .sb-link.active { background: transparent; border-color: transparent; box-shadow: none; }
+.sidebar-nav.has-indicator .sb-link { transition: color .35s ease, background-color .3s ease, transform .35s cubic-bezier(.22,1,.36,1); }
+.sidebar-nav.has-indicator .sb-link:hover:not(.active) { background: rgba(255,255,255,.035); transform: translateX(2px); }
+
+/* ==================================================================
    MOVIMENTO REDUZIDO
    ================================================================== */
 @media (prefers-reduced-motion: reduce) {
